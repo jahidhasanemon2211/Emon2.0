@@ -677,8 +677,14 @@
                         <textarea class="proj-desc w-full glass-input p-4 rounded-xl text-sm" rows="3" required>${desc}</textarea>
                     </div>
                     <div>
-                        <label class="block text-xs font-bold text-gray-500 tracking-wider uppercase mb-2">Banner Image URL</label>
-                        <input type="text" class="proj-img w-full glass-input p-4 rounded-xl text-sm" value="${img}" required>
+                        <div class="flex justify-between items-center mb-2">
+                            <label class="block text-xs font-bold text-gray-500 tracking-wider uppercase">Banner Image URL</label>
+                            <label class="cursor-pointer text-xs font-bold text-indigo-400 hover:text-indigo-300 transition flex items-center gap-1 bg-indigo-500/10 px-2 py-1 rounded-md border border-indigo-500/20">
+                                <i class="fas fa-cloud-upload-alt"></i> Upload
+                                <input type="file" accept="image/*" class="hidden" onchange="uploadImageToGitHub(this)">
+                            </label>
+                        </div>
+                        <input type="text" class="proj-img w-full glass-input p-4 rounded-xl text-sm" placeholder="Paste URL or upload image..." value="${img}" required>
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-gray-500 tracking-wider uppercase mb-2">Project Link (href)</label>
@@ -693,6 +699,69 @@
             if (confirm("Are you sure you want to remove this project?")) {
                 btn.closest('.project-item-card').remove();
             }
+        }
+
+        // Direct GitHub Image Upload
+        async function uploadImageToGitHub(fileInput) {
+            const file = fileInput.files[0];
+            if (!file) return;
+
+            // Get the input field where we'll set the uploaded image URL
+            const card = fileInput.closest('.project-item-card');
+            const imgInput = card.querySelector('.proj-img');
+
+            if (!ghConfig.token || !ghConfig.username || !ghConfig.repo) {
+                showAlert('Error', 'Please connect to GitHub first!', 'error');
+                return;
+            }
+
+            // Create a unique file name for the image
+            const fileExt = file.name.split('.').pop();
+            const fileName = `assets/projects/img_${Date.now()}.${fileExt}`;
+
+            // Read the file as Base64
+            const reader = new FileReader();
+            reader.onload = async function(e) {
+                const base64Data = e.target.result.split(',')[1];
+                
+                imgInput.value = "Uploading to GitHub... Please wait...";
+                imgInput.disabled = true;
+
+                try {
+                    const commitUrl = `https://api.github.com/repos/${ghConfig.username}/${ghConfig.repo}/contents/${fileName}`;
+                    const commitBody = {
+                        message: `Upload project image: ${fileName}`,
+                        content: base64Data,
+                        branch: ghConfig.branch || 'main'
+                    };
+
+                    const response = await fetch(commitUrl, {
+                        method: 'PUT',
+                        headers: {
+                            'Authorization': `token ${ghConfig.token}`,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(commitBody)
+                    });
+
+                    if (response.ok) {
+                        // Successfully uploaded! Set the URL to the file path
+                        imgInput.value = fileName;
+                        showAlert('Success', 'Image uploaded successfully!', 'success');
+                    } else {
+                        const errData = await response.json();
+                        imgInput.value = "";
+                        showAlert('Upload Failed', errData.message, 'error');
+                    }
+                } catch (error) {
+                    imgInput.value = "";
+                    showAlert('Error', error.message, 'error');
+                } finally {
+                    imgInput.disabled = false;
+                    fileInput.value = ""; // reset file input
+                }
+            };
+            reader.readAsDataURL(file);
         }
 
         // DOM Parser: Extract live values and fill inputs
