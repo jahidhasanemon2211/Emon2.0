@@ -845,17 +845,8 @@
                     }
                 });
 
-                // Re-serialize back to standard HTML string
-                const serializer = new XMLSerializer();
-                let serializedHTML = serializer.serializeToString(doc);
-                
-                // Add DOCTYPE if missing
-                if (!serializedHTML.startsWith('<!DOCTYPE') && !serializedHTML.startsWith('<!doctype')) {
-                    serializedHTML = '<!DOCTYPE html>\n' + serializedHTML;
-                }
-
-                // Clean XML namespace declaration artifacts from serialization in HTML elements
-                serializedHTML = serializedHTML.replace(/ xmlns="http:\/\/www.w3.org\/1999\/xhtml"/g, '');
+                // Re-serialize back to standard HTML string without corrupting <script> tags!
+                let serializedHTML = "<!DOCTYPE html>\n" + doc.documentElement.outerHTML;
 
                 // Safe base64 conversion supporting full UTF-8 emojis/Bengali characters
                 const utf8Bytes = new TextEncoder().encode(serializedHTML);
