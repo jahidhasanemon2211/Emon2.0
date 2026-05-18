@@ -349,58 +349,19 @@
 
                     <!-- TAB 3: FEATURED DEPLOYMENTS / PROJECTS -->
                     <div id="tabContent-projects" class="tab-pane hidden space-y-6">
-                        <div>
-                            <h2 class="text-xl font-bold mb-1 text-indigo-400">Featured Deployments</h2>
-                            <p class="text-xs text-gray-500">Edit major deployment projects showcase text, tags, and images.</p>
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h2 class="text-xl font-bold mb-1 text-indigo-400">Featured Deployments</h2>
+                                <p class="text-xs text-gray-500">Add, edit, or remove your deployment projects dynamically.</p>
+                            </div>
+                            <button type="button" onclick="addNewProject()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-xl text-xs flex items-center gap-1.5 transition glow-button">
+                                <i class="fas fa-plus"></i> Add Project
+                            </button>
                         </div>
                         <hr class="border-white/5">
 
-                        <div class="space-y-8">
-                            <!-- Project 1 -->
-                            <div class="p-6 rounded-2xl bg-white/[0.01] border border-white/5 space-y-4">
-                                <h3 class="text-base font-bold text-indigo-300 border-b border-white/5 pb-2">Project 1: Automated Network Alerting</h3>
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <div class="md:col-span-2">
-                                        <label class="block text-xs font-bold text-gray-500 tracking-wider uppercase mb-2">Project Title</label>
-                                        <input type="text" id="project-1-title" class="w-full glass-input p-4 rounded-xl text-sm" required>
-                                    </div>
-                                    <div class="md:col-span-2">
-                                        <label class="block text-xs font-bold text-gray-500 tracking-wider uppercase mb-2">Tags / Technologies (Separate with •)</label>
-                                        <input type="text" id="project-1-tags" class="w-full glass-input p-4 rounded-xl text-sm" required>
-                                    </div>
-                                    <div class="md:col-span-2">
-                                        <label class="block text-xs font-bold text-gray-500 tracking-wider uppercase mb-2">Description (Bengali)</label>
-                                        <textarea id="project-1-desc" rows="3" class="w-full glass-input p-4 rounded-xl text-sm" required></textarea>
-                                    </div>
-                                    <div class="md:col-span-2">
-                                        <label class="block text-xs font-bold text-gray-500 tracking-wider uppercase mb-2">Banner Image URL</label>
-                                        <input type="text" id="project-1-img" class="w-full glass-input p-4 rounded-xl text-sm" required>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Project 2 -->
-                            <div class="p-6 rounded-2xl bg-white/[0.01] border border-white/5 space-y-4">
-                                <h3 class="text-base font-bold text-indigo-300 border-b border-white/5 pb-2">Project 2: Infrastructure Monitoring</h3>
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <div class="md:col-span-2">
-                                        <label class="block text-xs font-bold text-gray-500 tracking-wider uppercase mb-2">Project Title</label>
-                                        <input type="text" id="project-2-title" class="w-full glass-input p-4 rounded-xl text-sm" required>
-                                    </div>
-                                    <div class="md:col-span-2">
-                                        <label class="block text-xs font-bold text-gray-500 tracking-wider uppercase mb-2">Tags / Technologies (Separate with •)</label>
-                                        <input type="text" id="project-2-tags" class="w-full glass-input p-4 rounded-xl text-sm" required>
-                                    </div>
-                                    <div class="md:col-span-2">
-                                        <label class="block text-xs font-bold text-gray-500 tracking-wider uppercase mb-2">Description (Bengali)</label>
-                                        <textarea id="project-2-desc" rows="3" class="w-full glass-input p-4 rounded-xl text-sm" required></textarea>
-                                    </div>
-                                    <div class="md:col-span-2">
-                                        <label class="block text-xs font-bold text-gray-500 tracking-wider uppercase mb-2">Banner Image URL</label>
-                                        <input type="text" id="project-2-img" class="w-full glass-input p-4 rounded-xl text-sm" required>
-                                    </div>
-                                </div>
-                            </div>
+                        <div id="dynamicProjectsList" class="space-y-6">
+                            <!-- Dynamic project cards will be generated here -->
                         </div>
                     </div>
 
@@ -694,16 +655,85 @@
             }
         }
 
+        // Dynamic Projects Helpers
+        function addNewProject(img = '', link = '#', title = '', tags = '', desc = '') {
+            const list = document.getElementById('dynamicProjectsList');
+            const card = document.createElement('div');
+            card.className = "project-item-card p-6 rounded-2xl bg-white/[0.01] border border-white/5 space-y-4 relative";
+            card.innerHTML = `
+                <button type="button" onclick="removeProject(this)" class="absolute top-4 right-4 px-2.5 py-1.5 bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 rounded-lg text-xs transition flex items-center gap-1"><i class="fas fa-trash-can"></i> Remove</button>
+                <h3 class="text-sm font-bold text-indigo-300">Project Details</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+                    <div class="md:col-span-2">
+                        <label class="block text-xs font-bold text-gray-500 tracking-wider uppercase mb-2">Project Title</label>
+                        <input type="text" class="proj-title w-full glass-input p-4 rounded-xl text-sm" value="${title}" required>
+                    </div>
+                    <div class="md:col-span-2">
+                        <label class="block text-xs font-bold text-gray-500 tracking-wider uppercase mb-2">Tags / Technologies (Separate with •)</label>
+                        <input type="text" class="proj-tags w-full glass-input p-4 rounded-xl text-sm" value="${tags}" required>
+                    </div>
+                    <div class="md:col-span-2">
+                        <label class="block text-xs font-bold text-gray-500 tracking-wider uppercase mb-2">Description (Bengali)</label>
+                        <textarea class="proj-desc w-full glass-input p-4 rounded-xl text-sm" rows="3" required>${desc}</textarea>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-500 tracking-wider uppercase mb-2">Banner Image URL</label>
+                        <input type="text" class="proj-img w-full glass-input p-4 rounded-xl text-sm" value="${img}" required>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-500 tracking-wider uppercase mb-2">Project Link (href)</label>
+                        <input type="text" class="proj-link w-full glass-input p-4 rounded-xl text-sm" value="${link}">
+                    </div>
+                </div>
+            `;
+            list.appendChild(card);
+        }
+
+        function removeProject(btn) {
+            if (confirm("Are you sure you want to remove this project?")) {
+                btn.closest('.project-item-card').remove();
+            }
+        }
+
         // DOM Parser: Extract live values and fill inputs
         function parseAndLoadFields(htmlString) {
             const parser = new DOMParser();
             const doc = parser.parseFromString(htmlString, 'text/html');
 
-            // Find all [data-cms] elements
+            // 1. Dynamic Projects Loading
+            const projectsContainer = doc.querySelector('[data-cms="projects-container"]');
+            const list = document.getElementById('dynamicProjectsList');
+            list.innerHTML = ""; // clear existing list
+
+            if (projectsContainer) {
+                const projectCards = projectsContainer.querySelectorAll('.group');
+                projectCards.forEach(card => {
+                    const imgEl = card.querySelector('img');
+                    const img = imgEl ? imgEl.getAttribute('src') : '';
+
+                    const linkEl = card.querySelector('a');
+                    const link = linkEl ? linkEl.getAttribute('href') : '#';
+
+                    const titleEl = card.querySelector('h3');
+                    const title = titleEl ? titleEl.innerText.trim() : '';
+
+                    const tagsEl = card.querySelector('p.text-gray-500');
+                    const tags = tagsEl ? tagsEl.innerText.trim() : '';
+
+                    const descEl = card.querySelector('p.text-gray-400');
+                    const desc = descEl ? descEl.innerText.trim() : '';
+
+                    addNewProject(img, link, title, tags, desc);
+                });
+            }
+
+            // 2. Regular [data-cms] elements loading
             const cmsElements = doc.querySelectorAll('[data-cms]');
             
             cmsElements.forEach(el => {
                 const key = el.getAttribute('data-cms');
+                if (key === 'projects-container') return; // handled dynamically above
+                
                 const inputEl = document.getElementById(key);
                 
                 if (inputEl) {
@@ -747,7 +777,40 @@
                 const parser = new DOMParser();
                 const doc = parser.parseFromString(rawHtmlData, 'text/html');
 
-                // Read all fields and update target tags
+                // 1. Reconstruct dynamic projects HTML inside data-cms="projects-container"
+                const projectsContainer = doc.querySelector('[data-cms="projects-container"]');
+                if (projectsContainer) {
+                    let projectsHTML = "";
+                    const projectCards = document.querySelectorAll('.project-item-card');
+                    
+                    projectCards.forEach((card, index) => {
+                        const title = card.querySelector('.proj-title').value.trim();
+                        const tags = card.querySelector('.proj-tags').value.trim();
+                        const desc = card.querySelector('.proj-desc').value.trim();
+                        const img = card.querySelector('.proj-img').value.trim();
+                        const link = card.querySelector('.proj-link').value.trim() || '#';
+                        const delay = index > 0 ? ` data-aos-delay="${index * 200}"` : '';
+
+                        projectsHTML += `
+                <!-- Project Item ${index + 1} -->
+                <div class="group" data-aos="zoom-in-up"${delay}>
+                    <div class="bento-card aspect-video mb-6 overflow-hidden">
+                        <img src="${img}" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
+                        <div class="absolute inset-0 bg-indigo-600/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+                            <a href="${link}" class="w-16 h-16 bg-white rounded-full flex items-center justify-center text-indigo-600 text-2xl shadow-xl hover:scale-110 transition-transform"><i class="fas fa-link"></i></a>
+                        </div>
+                    </div>
+                    <h3 class="text-2xl font-bold">${title}</h3>
+                    <p class="text-gray-500 mb-3 uppercase tracking-tighter text-xs font-bold">${tags}</p>
+                    <p class="text-gray-400 text-sm leading-relaxed mb-2">${desc}</p>
+                </div>
+`;
+                    });
+                    
+                    projectsContainer.innerHTML = projectsHTML;
+                }
+
+                // 2. Read all regular fields and update target tags
                 const formFields = document.querySelectorAll('#cmsForm input, #cmsForm textarea');
                 
                 formFields.forEach(field => {
