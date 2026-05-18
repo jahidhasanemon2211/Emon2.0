@@ -1,0 +1,869 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Emon 2.0 - Admin Portal</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    <!-- FontAwesome CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Outfit', 'sans-serif'],
+                    },
+                    colors: {
+                        darkBg: '#030712',
+                        darkCard: '#0f172a',
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        body {
+            background-color: #030712;
+            background-image: radial-gradient(circle at 50% 50%, #1e1b4b 0%, #030712 100%);
+            background-attachment: fixed;
+            color: #f3f4f6;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        .glass-panel {
+            background: rgba(15, 23, 42, 0.45);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        }
+
+        .glass-input {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            color: #f3f4f6;
+            transition: all 0.3s ease;
+        }
+
+        .glass-input:focus {
+            background: rgba(255, 255, 255, 0.07);
+            border-color: #6366f1;
+            box-shadow: 0 0 15px rgba(99, 102, 241, 0.15);
+            outline: none;
+        }
+
+        .tab-btn {
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .tab-btn.active {
+            color: #818cf8;
+        }
+
+        .tab-btn.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background-color: #6366f1;
+            box-shadow: 0 0 10px #6366f1;
+        }
+
+        .glow-button {
+            transition: all 0.3s ease;
+            box-shadow: 0 0 15px rgba(99, 102, 241, 0.2);
+        }
+
+        .glow-button:hover {
+            box-shadow: 0 0 25px rgba(99, 102, 241, 0.45);
+            transform: translateY(-2px);
+        }
+
+        /* Scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(3, 7, 18, 0.5);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(99, 102, 241, 0.3);
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(99, 102, 241, 0.5);
+        }
+    </style>
+</head>
+
+<body class="min-h-screen py-10 px-4 md:px-6">
+
+    <!-- LOGIN PORTAL PANEL -->
+    <div id="loginPanel" class="max-w-md mx-auto mt-20 glass-panel rounded-3xl p-8 md:p-10 hidden" data-aos="fade-up">
+        <div class="text-center mb-8">
+            <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-indigo-500/10 border border-indigo-500/30 text-indigo-400 text-3xl mb-4">
+                <i class="fas fa-lock text-glow"></i>
+            </div>
+            <h1 class="text-3xl font-black tracking-tight mb-2">Admin Portal</h1>
+            <p class="text-gray-400 text-sm">Please log in with your administrative credentials to continue.</p>
+        </div>
+
+        <form id="loginForm" class="space-y-6">
+            <div>
+                <label class="block text-xs font-bold text-gray-400 tracking-wider uppercase mb-2">Username</label>
+                <div class="relative">
+                    <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-gray-500">
+                        <i class="fas fa-user"></i>
+                    </span>
+                    <input type="text" id="adminUser" placeholder="Enter username" required
+                        class="w-full glass-input pl-10 pr-4 py-4 rounded-xl text-sm">
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-xs font-bold text-gray-400 tracking-wider uppercase mb-2">Password</label>
+                <div class="relative">
+                    <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-gray-500">
+                        <i class="fas fa-shield-halved"></i>
+                    </span>
+                    <input type="password" id="adminPass" placeholder="Enter password" required
+                        class="w-full glass-input pl-10 pr-4 py-4 rounded-xl text-sm">
+                </div>
+            </div>
+
+            <button type="submit"
+                class="w-full py-4 bg-indigo-600 rounded-xl font-bold uppercase tracking-wider text-sm text-white hover:bg-indigo-500 transition glow-button flex items-center justify-center gap-2">
+                <i class="fas fa-right-to-bracket"></i> Login Securely
+            </button>
+        </form>
+    </div>
+
+    <!-- SETUP WIZARD PANEL (Visible when credentials are missing) -->
+    <div id="setupWizard" class="max-w-xl mx-auto mt-16 glass-panel rounded-3xl p-8 md:p-10 hidden" data-aos="fade-up">
+        <div class="text-center mb-8">
+            <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-indigo-500/10 border border-indigo-500/30 text-indigo-400 text-3xl mb-4">
+                <i class="fas fa-server"></i>
+            </div>
+            <h1 class="text-3xl font-black tracking-tight mb-2">Admin Setup Wizard</h1>
+            <p class="text-gray-400 text-sm">Enter your GitHub credentials to connect this admin panel to your repository. This allows real-time deployments to your website.</p>
+        </div>
+
+        <form id="setupForm" class="space-y-6">
+            <div>
+                <label class="block text-xs font-bold text-gray-400 tracking-wider uppercase mb-2">GitHub Username</label>
+                <div class="relative">
+                    <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-gray-500">
+                        <i class="fab fa-github"></i>
+                    </span>
+                    <input type="text" id="ghUsername" placeholder="e.g. jahidhasanemon2211" required
+                        class="w-full glass-input pl-10 pr-4 py-4 rounded-xl text-sm">
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-xs font-bold text-gray-400 tracking-wider uppercase mb-2">Repository Name</label>
+                <div class="relative">
+                    <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-gray-500">
+                        <i class="fas fa-code-branch"></i>
+                    </span>
+                    <input type="text" id="ghRepo" placeholder="e.g. Emon2.0" required
+                        class="w-full glass-input pl-10 pr-4 py-4 rounded-xl text-sm">
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-xs font-bold text-gray-400 tracking-wider uppercase mb-2">Branch</label>
+                <div class="relative">
+                    <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-gray-500">
+                        <i class="fas fa-code-fork"></i>
+                    </span>
+                    <input type="text" id="ghBranch" value="main" required
+                        class="w-full glass-input pl-10 pr-4 py-4 rounded-xl text-sm">
+                </div>
+            </div>
+
+            <div>
+                <div class="flex justify-between items-center mb-2">
+                    <label class="block text-xs font-bold text-gray-400 tracking-wider uppercase">GitHub Personal Access Token (PAT)</label>
+                    <a href="https://github.com/settings/tokens/new?scopes=repo" target="_blank" 
+                        class="text-xs text-indigo-400 hover:underline">Get Token <i class="fas fa-external-link-alt text-[9px]"></i></a>
+                </div>
+                <div class="relative">
+                    <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-gray-500">
+                        <i class="fas fa-key"></i>
+                    </span>
+                    <input type="password" id="ghToken" placeholder="ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" required
+                        class="w-full glass-input pl-10 pr-4 py-4 rounded-xl text-sm">
+                </div>
+                <p class="text-[10px] text-gray-500 mt-2 leading-relaxed">
+                    <i class="fas fa-shield-alt mr-1 text-indigo-400"></i> Securely stored locally on your device's <b>localStorage</b>. Never sent to any external server.
+                </p>
+            </div>
+
+            <button type="submit"
+                class="w-full py-4 bg-indigo-600 rounded-xl font-bold uppercase tracking-wider text-sm text-white hover:bg-indigo-500 transition glow-button flex items-center justify-center gap-2">
+                <i class="fas fa-plug"></i> Connect Repository
+            </button>
+        </form>
+    </div>
+
+    <!-- MAIN ADMIN DASHBOARD PANEL (Visible when credentials exist) -->
+    <div id="adminDashboard" class="max-w-6xl mx-auto glass-panel rounded-3xl overflow-hidden hidden" data-aos="fade-up">
+        <!-- Top Bar -->
+        <div class="p-6 md:p-8 border-b border-white/5 flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white/[0.01]">
+            <div class="flex items-center gap-4">
+                <div class="w-12 h-12 rounded-xl bg-indigo-500/10 border border-indigo-500/30 text-indigo-400 flex items-center justify-center text-xl">
+                    <i class="fas fa-sliders"></i>
+                </div>
+                <div>
+                    <h1 class="text-2xl font-black tracking-tight flex items-center gap-2">Emon 2.0 <span class="text-xs py-1 px-3 bg-indigo-500/20 text-indigo-400 rounded-full border border-indigo-500/30">NOC CMS</span></h1>
+                    <p class="text-xs text-gray-500 tracking-wider uppercase mt-1 flex items-center gap-1.5">
+                        <span class="inline-block w-2 h-2 rounded-full bg-green-500 animate-ping"></span> 
+                        Connected: <span id="connectedRepoLabel" class="text-gray-300 font-bold">username/repo</span>
+                    </p>
+                </div>
+            </div>
+            
+            <div class="flex items-center gap-3">
+                <button onclick="fetchCurrentData()" class="px-4 py-2.5 bg-white/5 hover:bg-white/10 rounded-xl text-xs font-bold border border-white/10 transition flex items-center gap-2">
+                    <i class="fas fa-arrows-rotate"></i> Pull Latest
+                </button>
+                <button onclick="logout()" class="px-4 py-2.5 bg-red-500/10 hover:bg-red-500/20 text-red-400 rounded-xl text-xs font-bold border border-red-500/20 transition flex items-center gap-2">
+                    <i class="fas fa-sign-out-alt"></i> Disconnect
+                </button>
+            </div>
+        </div>
+
+        <!-- Dashboard Content Body -->
+        <div class="grid md:grid-cols-4 min-h-[500px]">
+            <!-- Sidebar Navigation -->
+            <div class="md:col-span-1 border-r border-white/5 p-4 space-y-1 bg-white/[0.005]">
+                <button onclick="switchTab('hero')" id="tabBtn-hero" class="tab-btn active w-full px-4 py-3.5 rounded-xl text-sm font-semibold flex items-center gap-3 hover:bg-white/5">
+                    <i class="fas fa-home w-5"></i> Hero Section
+                </button>
+                <button onclick="switchTab('skills')" id="tabBtn-skills" class="tab-btn w-full px-4 py-3.5 rounded-xl text-sm font-semibold flex items-center gap-3 hover:bg-white/5">
+                    <i class="fas fa-network-wired w-5"></i> Network Stack
+                </button>
+                <button onclick="switchTab('projects')" id="tabBtn-projects" class="tab-btn w-full px-4 py-3.5 rounded-xl text-sm font-semibold flex items-center gap-3 hover:bg-white/5">
+                    <i class="fas fa-project-diagram w-5"></i> Featured Deployments
+                </button>
+                <button onclick="switchTab('contacts')" id="tabBtn-contacts" class="tab-btn w-full px-4 py-3.5 rounded-xl text-sm font-semibold flex items-center gap-3 hover:bg-white/5">
+                    <i class="fas fa-envelope-open-text w-5"></i> Contact & Socials
+                </button>
+            </div>
+
+            <!-- Content Area Form -->
+            <div class="md:col-span-3 p-8">
+                <form id="cmsForm" class="space-y-8" onsubmit="handleSaveAndDeploy(event)">
+                    
+                    <!-- TAB 1: HERO SECTION -->
+                    <div id="tabContent-hero" class="tab-pane space-y-6">
+                        <div>
+                            <h2 class="text-xl font-bold mb-1 text-indigo-400">Hero Section Content</h2>
+                            <p class="text-xs text-gray-500">Update the introductory header badge, primary hero title, and Bengali description.</p>
+                        </div>
+                        <hr class="border-white/5">
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="md:col-span-2">
+                                <label class="block text-xs font-bold text-gray-400 tracking-wider uppercase mb-2">Intro Badge Role</label>
+                                <input type="text" id="hero-badge" class="w-full glass-input p-4 rounded-xl text-sm" required>
+                            </div>
+                            <div class="md:col-span-2">
+                                <label class="block text-xs font-bold text-gray-400 tracking-wider uppercase mb-2">Hero Main Title (HTML supported)</label>
+                                <input type="text" id="hero-title" class="w-full glass-input p-4 rounded-xl text-sm" required>
+                            </div>
+                            <div class="md:col-span-2">
+                                <label class="block text-xs font-bold text-gray-400 tracking-wider uppercase mb-2">Introduction Paragraph (Bengali)</label>
+                                <textarea id="hero-desc" rows="4" class="w-full glass-input p-4 rounded-xl text-sm leading-relaxed" required></textarea>
+                            </div>
+                            <div class="md:col-span-2">
+                                <label class="block text-xs font-bold text-gray-400 tracking-wider uppercase mb-2">Resume PDF Link</label>
+                                <input type="text" id="resume-link" class="w-full glass-input p-4 rounded-xl text-sm" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- TAB 2: NETWORK STACK / SKILLS -->
+                    <div id="tabContent-skills" class="tab-pane hidden space-y-6">
+                        <div>
+                            <h2 class="text-xl font-bold mb-1 text-indigo-400">Network Stack & Skills Descriptions</h2>
+                            <p class="text-xs text-gray-500">Update descriptions inside your technical stack cards.</p>
+                        </div>
+                        <hr class="border-white/5">
+
+                        <div class="space-y-6">
+                            <!-- Card 1 -->
+                            <div class="p-5 rounded-2xl bg-white/[0.01] border border-white/5 space-y-4">
+                                <h3 class="text-sm font-bold text-indigo-300 flex items-center gap-2"><i class="fas fa-network-wired"></i> Core Routing & Switching (Large Card)</h3>
+                                <div>
+                                    <label class="block text-xs font-bold text-gray-500 tracking-wider uppercase mb-2">Description</label>
+                                    <textarea id="skill-1-desc" rows="3" class="w-full glass-input p-4 rounded-xl text-sm" required></textarea>
+                                </div>
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-xs font-bold text-gray-500 tracking-wider uppercase mb-2">Proficiency (%)</label>
+                                        <input type="text" id="skill-1-proficiency" class="w-full glass-input p-3 rounded-xl text-sm" required>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Card 2 -->
+                            <div class="p-5 rounded-2xl bg-white/[0.01] border border-white/5 space-y-4">
+                                <h3 class="text-sm font-bold text-indigo-300 flex items-center gap-2"><i class="fas fa-chart-line"></i> Network Monitoring & Alerts (Small Card)</h3>
+                                <div>
+                                    <label class="block text-xs font-bold text-gray-500 tracking-wider uppercase mb-2">Description</label>
+                                    <textarea id="skill-2-desc" rows="3" class="w-full glass-input p-4 rounded-xl text-sm" required></textarea>
+                                </div>
+                            </div>
+
+                            <!-- Card 3 -->
+                            <div class="p-5 rounded-2xl bg-white/[0.01] border border-white/5 space-y-4">
+                                <h3 class="text-sm font-bold text-indigo-300 flex items-center gap-2"><i class="fas fa-ethernet"></i> FTTx & Broadband Management (Small Card)</h3>
+                                <div>
+                                    <label class="block text-xs font-bold text-gray-500 tracking-wider uppercase mb-2">Description</label>
+                                    <textarea id="skill-3-desc" rows="3" class="w-full glass-input p-4 rounded-xl text-sm" required></textarea>
+                                </div>
+                            </div>
+
+                            <!-- Card 4 -->
+                            <div class="p-5 rounded-2xl bg-white/[0.01] border border-white/5 space-y-4">
+                                <h3 class="text-sm font-bold text-indigo-300 flex items-center gap-2"><i class="fas fa-shield-alt"></i> System & Infrastructure Security (Wide Card)</h3>
+                                <div>
+                                    <label class="block text-xs font-bold text-gray-500 tracking-wider uppercase mb-2">Description</label>
+                                    <textarea id="skill-4-desc" rows="3" class="w-full glass-input p-4 rounded-xl text-sm" required></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- TAB 3: FEATURED DEPLOYMENTS / PROJECTS -->
+                    <div id="tabContent-projects" class="tab-pane hidden space-y-6">
+                        <div>
+                            <h2 class="text-xl font-bold mb-1 text-indigo-400">Featured Deployments</h2>
+                            <p class="text-xs text-gray-500">Edit major deployment projects showcase text, tags, and images.</p>
+                        </div>
+                        <hr class="border-white/5">
+
+                        <div class="space-y-8">
+                            <!-- Project 1 -->
+                            <div class="p-6 rounded-2xl bg-white/[0.01] border border-white/5 space-y-4">
+                                <h3 class="text-base font-bold text-indigo-300 border-b border-white/5 pb-2">Project 1: Automated Network Alerting</h3>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div class="md:col-span-2">
+                                        <label class="block text-xs font-bold text-gray-500 tracking-wider uppercase mb-2">Project Title</label>
+                                        <input type="text" id="project-1-title" class="w-full glass-input p-4 rounded-xl text-sm" required>
+                                    </div>
+                                    <div class="md:col-span-2">
+                                        <label class="block text-xs font-bold text-gray-500 tracking-wider uppercase mb-2">Tags / Technologies (Separate with •)</label>
+                                        <input type="text" id="project-1-tags" class="w-full glass-input p-4 rounded-xl text-sm" required>
+                                    </div>
+                                    <div class="md:col-span-2">
+                                        <label class="block text-xs font-bold text-gray-500 tracking-wider uppercase mb-2">Description (Bengali)</label>
+                                        <textarea id="project-1-desc" rows="3" class="w-full glass-input p-4 rounded-xl text-sm" required></textarea>
+                                    </div>
+                                    <div class="md:col-span-2">
+                                        <label class="block text-xs font-bold text-gray-500 tracking-wider uppercase mb-2">Banner Image URL</label>
+                                        <input type="text" id="project-1-img" class="w-full glass-input p-4 rounded-xl text-sm" required>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Project 2 -->
+                            <div class="p-6 rounded-2xl bg-white/[0.01] border border-white/5 space-y-4">
+                                <h3 class="text-base font-bold text-indigo-300 border-b border-white/5 pb-2">Project 2: Infrastructure Monitoring</h3>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div class="md:col-span-2">
+                                        <label class="block text-xs font-bold text-gray-500 tracking-wider uppercase mb-2">Project Title</label>
+                                        <input type="text" id="project-2-title" class="w-full glass-input p-4 rounded-xl text-sm" required>
+                                    </div>
+                                    <div class="md:col-span-2">
+                                        <label class="block text-xs font-bold text-gray-500 tracking-wider uppercase mb-2">Tags / Technologies (Separate with •)</label>
+                                        <input type="text" id="project-2-tags" class="w-full glass-input p-4 rounded-xl text-sm" required>
+                                    </div>
+                                    <div class="md:col-span-2">
+                                        <label class="block text-xs font-bold text-gray-500 tracking-wider uppercase mb-2">Description (Bengali)</label>
+                                        <textarea id="project-2-desc" rows="3" class="w-full glass-input p-4 rounded-xl text-sm" required></textarea>
+                                    </div>
+                                    <div class="md:col-span-2">
+                                        <label class="block text-xs font-bold text-gray-500 tracking-wider uppercase mb-2">Banner Image URL</label>
+                                        <input type="text" id="project-2-img" class="w-full glass-input p-4 rounded-xl text-sm" required>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- TAB 4: CONTACTS & SOCIALS -->
+                    <div id="tabContent-contacts" class="tab-pane hidden space-y-6">
+                        <div>
+                            <h2 class="text-xl font-bold mb-1 text-indigo-400">Contact Section & Social Media</h2>
+                            <p class="text-xs text-gray-500">Edit call to action headings, emails, and direct social profile urls.</p>
+                        </div>
+                        <hr class="border-white/5">
+
+                        <div class="space-y-6">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div class="md:col-span-2">
+                                    <label class="block text-xs font-bold text-gray-500 tracking-wider uppercase mb-2">Support Title</label>
+                                    <input type="text" id="contact-title" class="w-full glass-input p-4 rounded-xl text-sm" required>
+                                </div>
+                                <div class="md:col-span-2">
+                                    <label class="block text-xs font-bold text-gray-500 tracking-wider uppercase mb-2">Support Description (Bengali)</label>
+                                    <textarea id="contact-desc" rows="3" class="w-full glass-input p-4 rounded-xl text-sm" required></textarea>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-gray-500 tracking-wider uppercase mb-2">Direct Email Address</label>
+                                    <input type="email" id="contact-email" class="w-full glass-input p-4 rounded-xl text-sm" required>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-gray-500 tracking-wider uppercase mb-2">Direct Telephone (e.g. +88013...)</label>
+                                    <input type="text" id="contact-phone" class="w-full glass-input p-4 rounded-xl text-sm" required>
+                                </div>
+                            </div>
+
+                            <hr class="border-white/5">
+                            <h3 class="text-sm font-bold text-indigo-300">Social Accounts Linking</h3>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-xs font-bold text-gray-500 tracking-wider uppercase mb-2">Facebook Profile URL</label>
+                                    <input type="text" id="link-facebook" class="w-full glass-input p-3 rounded-xl text-sm" required>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-gray-500 tracking-wider uppercase mb-2">GitHub Profile URL</label>
+                                    <input type="text" id="link-github" class="w-full glass-input p-3 rounded-xl text-sm" required>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-gray-500 tracking-wider uppercase mb-2">LinkedIn Profile URL</label>
+                                    <input type="text" id="link-linkedin" class="w-full glass-input p-3 rounded-xl text-sm" required>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-gray-500 tracking-wider uppercase mb-2">Instagram Profile URL</label>
+                                    <input type="text" id="link-instagram" class="w-full glass-input p-3 rounded-xl text-sm" required>
+                                </div>
+                                <div class="md:col-span-2">
+                                    <label class="block text-xs font-bold text-gray-500 tracking-wider uppercase mb-2">WhatsApp Contact URL (e.g. https://wa.me/...)</label>
+                                    <input type="text" id="link-whatsapp" class="w-full glass-input p-3 rounded-xl text-sm" required>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Submit Deployment Button (Unified Footer) -->
+                    <div class="border-t border-white/5 pt-6 flex items-center justify-between">
+                        <div class="text-xs text-gray-500">
+                            * Changes will create a direct Git commit & trigger auto deployment.
+                        </div>
+                        <button type="submit"
+                            class="px-8 py-4 bg-indigo-600 hover:bg-indigo-500 text-white font-bold uppercase tracking-widest rounded-2xl flex items-center gap-3 glow-button text-sm">
+                            <i class="fas fa-rocket"></i> Save & Deploy Content
+                        </button>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- FULLSCREEN LOADER CONTAINER -->
+    <div id="loaderOverlay" class="fixed inset-0 bg-darkBg/95 backdrop-blur-md flex flex-col justify-center items-center z-50 hidden">
+        <div class="relative flex justify-center items-center mb-8">
+            <!-- Spinner -->
+            <div class="w-24 h-24 rounded-full border-4 border-indigo-500/10 border-t-indigo-500 animate-spin"></div>
+            <!-- Center Icon -->
+            <div class="absolute text-indigo-400 text-3xl animate-pulse">
+                <i class="fas fa-server"></i>
+            </div>
+        </div>
+        <h3 id="loaderTitle" class="text-2xl font-black mb-2">Fetching Repository...</h3>
+        <p id="loaderSubtitle" class="text-gray-400 text-sm tracking-wide">Syncing data structures, please wait.</p>
+    </div>
+
+    <!-- NOTIFICATION POPUPS -->
+    <div id="alertBox" class="fixed top-5 right-5 max-w-sm glass-panel p-5 rounded-2xl border-l-4 border-indigo-500 shadow-2xl flex items-start gap-4 transform translate-x-[150%] transition-transform duration-500 z-50">
+        <div id="alertIcon" class="w-10 h-10 rounded-xl bg-indigo-500/10 text-indigo-400 flex items-center justify-center text-lg flex-shrink-0">
+            <i class="fas fa-circle-info"></i>
+        </div>
+        <div>
+            <h4 id="alertTitle" class="font-bold text-sm">Notification</h4>
+            <p id="alertMsg" class="text-xs text-gray-400 mt-1 leading-relaxed">Operation processed successfully.</p>
+        </div>
+    </div>
+
+    <!-- CORE CMS ENGINE LOGIC -->
+    <script>
+        let ghConfig = {};
+        let rawHtmlData = "";
+        let rawHtmlSha = "";
+
+        // On Page Load
+        window.addEventListener('DOMContentLoaded', () => {
+            initApp();
+        });
+
+        // Initialize state
+        function initApp() {
+            const token = localStorage.getItem('gh_token');
+            const username = localStorage.getItem('gh_username');
+            const repo = localStorage.getItem('gh_repo');
+            const branch = localStorage.getItem('gh_branch') || 'main';
+
+            const isAuthenticated = sessionStorage.getItem('admin_authenticated') === 'true';
+
+            if (!isAuthenticated) {
+                document.getElementById('loginPanel').classList.remove('hidden');
+                document.getElementById('setupWizard').classList.add('hidden');
+                document.getElementById('adminDashboard').classList.add('hidden');
+            } else {
+                document.getElementById('loginPanel').classList.add('hidden');
+                
+                if (!token || !username || !repo) {
+                    document.getElementById('setupWizard').classList.remove('hidden');
+                    document.getElementById('adminDashboard').classList.add('hidden');
+                } else {
+                    ghConfig = { token, username, repo, branch };
+                    document.getElementById('setupWizard').classList.add('hidden');
+                    document.getElementById('adminDashboard').classList.remove('hidden');
+                    document.getElementById('connectedRepoLabel').innerText = `${username}/${repo} (${branch})`;
+                    
+                    // Fetch live website content from GitHub immediately
+                    fetchCurrentData();
+                }
+            }
+        }
+
+        // Handle Login Submission
+        document.getElementById('loginForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const u = document.getElementById('adminUser').value.trim();
+            const p = document.getElementById('adminPass').value;
+
+            if (u === "jahidhasanemon" && p === "Emon123@") {
+                sessionStorage.setItem('admin_authenticated', 'true');
+                showAlert('Login Success', 'Welcome back, Emon!', 'success');
+                initApp();
+            } else {
+                showAlert('Access Denied', 'Incorrect username or password.', 'error');
+            }
+        });
+
+        // Handle Setup Form Submission
+        document.getElementById('setupForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const username = document.getElementById('ghUsername').value.trim();
+            const repo = document.getElementById('ghRepo').value.trim();
+            const branch = document.getElementById('ghBranch').value.trim() || 'main';
+            const token = document.getElementById('ghToken').value.trim();
+
+            localStorage.setItem('gh_username', username);
+            localStorage.setItem('gh_repo', repo);
+            localStorage.setItem('gh_branch', branch);
+            localStorage.setItem('gh_token', token);
+
+            showAlert('Success', 'Repository credentials saved locally!', 'success');
+            initApp();
+        });
+
+        // Disconnect & Logout
+        function logout() {
+            if(confirm("Are you sure you want to disconnect? This will wipe your GitHub credentials and log you out.")) {
+                localStorage.clear();
+                sessionStorage.clear();
+                ghConfig = {};
+                rawHtmlData = "";
+                rawHtmlSha = "";
+                document.getElementById('setupForm').reset();
+                document.getElementById('loginForm').reset();
+                initApp();
+            }
+        }
+
+        // Show/Hide Loader
+        function showLoader(title, subtitle = "Deploying to web node...") {
+            document.getElementById('loaderTitle').innerText = title;
+            document.getElementById('loaderSubtitle').innerText = subtitle;
+            document.getElementById('loaderOverlay').classList.remove('hidden');
+        }
+
+        function hideLoader() {
+            document.getElementById('loaderOverlay').classList.add('hidden');
+        }
+
+        // Show Beautiful Alert Notification
+        function showAlert(title, msg, type = 'info') {
+            const alertBox = document.getElementById('alertBox');
+            const alertTitle = document.getElementById('alertTitle');
+            const alertMsg = document.getElementById('alertMsg');
+            const alertIcon = document.getElementById('alertIcon');
+
+            alertTitle.innerText = title;
+            alertMsg.innerText = msg;
+
+            // Customize colors based on type
+            if (type === 'success') {
+                alertBox.className = "fixed top-5 right-5 max-w-sm glass-panel p-5 rounded-2xl border-l-4 border-emerald-500 shadow-2xl flex items-start gap-4 transform transition-transform duration-500 z-50";
+                alertIcon.className = "w-10 h-10 rounded-xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center text-lg flex-shrink-0";
+                alertIcon.innerHTML = `<i class="fas fa-circle-check"></i>`;
+            } else if (type === 'error') {
+                alertBox.className = "fixed top-5 right-5 max-w-sm glass-panel p-5 rounded-2xl border-l-4 border-red-500 shadow-2xl flex items-start gap-4 transform transition-transform duration-500 z-50";
+                alertIcon.className = "w-10 h-10 rounded-xl bg-red-500/10 text-red-400 flex items-center justify-center text-lg flex-shrink-0";
+                alertIcon.innerHTML = `<i class="fas fa-triangle-exclamation"></i>`;
+            } else {
+                alertBox.className = "fixed top-5 right-5 max-w-sm glass-panel p-5 rounded-2xl border-l-4 border-indigo-500 shadow-2xl flex items-start gap-4 transform transition-transform duration-500 z-50";
+                alertIcon.className = "w-10 h-10 rounded-xl bg-indigo-500/10 text-indigo-400 flex items-center justify-center text-lg flex-shrink-0";
+                alertIcon.innerHTML = `<i class="fas fa-circle-info"></i>`;
+            }
+
+            // Animate In
+            alertBox.style.transform = "translateX(0)";
+
+            // Auto Close after 4s
+            setTimeout(() => {
+                alertBox.style.transform = "translateX(150%)";
+            }, 4000);
+        }
+
+        // Tab Switch logic
+        function switchTab(tabName) {
+            // Hide all tab panes
+            document.querySelectorAll('.tab-pane').forEach(el => el.classList.add('hidden'));
+            // Remove active classes from buttons
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+
+            // Show selected pane & button active state
+            document.getElementById(`tabContent-${tabName}`).classList.remove('hidden');
+            document.getElementById(`tabBtn-${tabName}`).classList.add('active');
+        }
+
+        // GitHub API: Fetch current index.html Content
+        async function fetchCurrentData() {
+            showLoader("Connecting to GitHub...", `Pulling index.html from ${ghConfig.username}/${ghConfig.repo}...`);
+
+            const url = `https://api.github.com/repos/${ghConfig.username}/${ghConfig.repo}/contents/index.html?ref=${ghConfig.branch}`;
+
+            try {
+                const response = await fetch(url, {
+                    headers: {
+                        'Authorization': `token ${ghConfig.token}`,
+                        'Accept': 'application/vnd.github.v3+json'
+                    }
+                });
+
+                if (!response.ok) {
+                    if (response.status === 404) {
+                        throw new Error(`Failed to load index.html (404: Not Found).\n\nPossible Causes:\n1. Your Username or Repo Name is misspelled.\n2. The branch is wrong (try "master" instead of "main" in settings).\n3. Your repo is completely empty and has no index.html yet.\n4. Your Token is correct but lacks access to Private Repositories.`);
+                    } else if (response.status === 401 || response.status === 403) {
+                        throw new Error(`Authentication Failed (Status ${response.status}).\n\nPossible Causes:\n1. Your GitHub Personal Access Token (PAT) is incorrect or expired.\n2. The PAT lacks "repo" scope privileges.`);
+                    }
+                    throw new Error(`Failed to load index.html (${response.status} ${response.statusText}). Check your credentials.`);
+                }
+
+                const data = await response.json();
+                rawHtmlSha = data.sha;
+                
+                // Decode base64 HTML string safely using standard atob + decodeURIComponent to handle UTF-8 Bengali characters perfectly
+                const base64Clean = data.content.replace(/\s/g, '');
+                const binaryString = atob(base64Clean);
+                const bytes = new Uint8Array(binaryString.length);
+                for (let i = 0; i < binaryString.length; i++) {
+                    bytes[i] = binaryString.charCodeAt(i);
+                }
+                rawHtmlData = new TextDecoder('utf-8').decode(bytes);
+
+                // Parse XML/HTML Document to extract values
+                parseAndLoadFields(rawHtmlData);
+                showAlert('Success', 'Pulled latest website contents successfully!', 'success');
+
+            } catch (err) {
+                showAlert('GitHub Fetch Error', err.message, 'error');
+                console.error(err);
+            } finally {
+                hideLoader();
+            }
+        }
+
+        // DOM Parser: Extract live values and fill inputs
+        function parseAndLoadFields(htmlString) {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(htmlString, 'text/html');
+
+            // Find all [data-cms] elements
+            const cmsElements = doc.querySelectorAll('[data-cms]');
+            
+            cmsElements.forEach(el => {
+                const key = el.getAttribute('data-cms');
+                const inputEl = document.getElementById(key);
+                
+                if (inputEl) {
+                    if (key.includes('img')) {
+                        // Project image source url
+                        inputEl.value = el.getAttribute('src') || '';
+                    } else if (key.includes('link')) {
+                        // Profile CV link or Facebook/Social links
+                        inputEl.value = el.getAttribute('href') || '';
+                    } else if (key === 'contact-email') {
+                        // Href has mailto: but we only want raw text inside email
+                        inputEl.value = el.innerText.trim();
+                    } else if (key === 'contact-phone') {
+                        // Href has tel: but we only want raw text inside phone
+                        inputEl.value = el.innerText.trim();
+                    } else {
+                        // Regular text block or HTML titles
+                        inputEl.value = el.innerHTML.trim().replace(/\s+/g, ' ');
+                    }
+                }
+            });
+        }
+
+        // Form Submit: Prepare DOM elements, build index.html string, and commit/deploy
+        async function handleSaveAndDeploy(e) {
+            e.preventDefault();
+
+            if (!rawHtmlData || !rawHtmlSha) {
+                showAlert('Invalid Action', 'Cannot write updates. Pull the latest repository data first.', 'error');
+                return;
+            }
+
+            if (!confirm("Are you sure you want to deploy these changes directly to your live website?")) {
+                return;
+            }
+
+            showLoader("Deploying Changes...", "Updating DOM structure and encoding UTF-8...");
+
+            try {
+                // Parse original HTML base
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(rawHtmlData, 'text/html');
+
+                // Read all fields and update target tags
+                const formFields = document.querySelectorAll('#cmsForm input, #cmsForm textarea');
+                
+                formFields.forEach(field => {
+                    if (!field.id) return;
+                    const key = field.id;
+                    const val = field.value.trim();
+                    
+                    const el = doc.querySelector(`[data-cms="${key}"]`);
+                    if (el) {
+                        if (key.includes('img')) {
+                            el.setAttribute('src', val);
+                        } else if (key.includes('link') && key !== 'contact-email' && key !== 'contact-phone') {
+                            el.setAttribute('href', val);
+                        } else if (key === 'contact-email') {
+                            el.setAttribute('href', `mailto:${val}`);
+                            el.innerHTML = `<i class="fas fa-envelope"></i> ${val}`;
+                        } else if (key === 'contact-phone') {
+                            el.setAttribute('href', `tel:${val}`);
+                            el.innerHTML = `<i class="fas fa-phone"></i> ${val}`;
+                        } else if (key === 'skill-1-proficiency') {
+                            // Text percentage
+                            el.innerHTML = val;
+                            // Update matching bar element
+                            const bar = doc.querySelector('[data-cms="skill-1-bar"]');
+                            if (bar) {
+                                bar.setAttribute('style', `width: ${parseInt(val) || 0}%;`);
+                            }
+                        } else {
+                            // Inject user text or HTML content
+                            el.innerHTML = val;
+                        }
+                    }
+                });
+
+                // Re-serialize back to standard HTML string
+                const serializer = new XMLSerializer();
+                let serializedHTML = serializer.serializeToString(doc);
+                
+                // Add DOCTYPE if missing
+                if (!serializedHTML.startsWith('<!DOCTYPE') && !serializedHTML.startsWith('<!doctype')) {
+                    serializedHTML = '<!DOCTYPE html>\n' + serializedHTML;
+                }
+
+                // Clean XML namespace declaration artifacts from serialization in HTML elements
+                serializedHTML = serializedHTML.replace(/ xmlns="http:\/\/www.w3.org\/1999\/xhtml"/g, '');
+
+                // Safe base64 conversion supporting full UTF-8 emojis/Bengali characters
+                const utf8Bytes = new TextEncoder().encode(serializedHTML);
+                let binary = "";
+                const len = utf8Bytes.byteLength;
+                for (let i = 0; i < len; i++) {
+                    binary += String.fromCharCode(utf8Bytes[i]);
+                }
+                const base64UpdatedContent = btoa(binary);
+
+                // Commit back to GitHub
+                showLoader("Committing to Git...", "Creating Git commit and updating live files...");
+
+                const commitUrl = `https://api.github.com/repos/${ghConfig.username}/${ghConfig.repo}/contents/index.html`;
+                const commitBody = {
+                    message: `CMS Update: Contents updated via Emon 2.0 Web Admin Panel`,
+                    content: base64UpdatedContent,
+                    sha: rawHtmlSha,
+                    branch: ghConfig.branch
+                };
+
+                const commitResponse = await fetch(commitUrl, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `token ${ghConfig.token}`,
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/vnd.github.v3+json'
+                    },
+                    body: JSON.stringify(commitBody)
+                });
+
+                if (!commitResponse.ok) {
+                    const errData = await commitResponse.json();
+                    throw new Error(`Git commit failed: ${errData.message || commitResponse.statusText}`);
+                }
+
+                const commitResult = await commitResponse.json();
+                
+                // Save the new SHA returned by the API to allow continuous updates without manual pulling
+                rawHtmlSha = commitResult.content.sha;
+                rawHtmlData = serializedHTML; // Keep updated in memory
+
+                hideLoader();
+                
+                // Stunning deployment timer/celebration!
+                showDeploymentCelebration();
+
+            } catch (err) {
+                hideLoader();
+                showAlert('Deployment Failed', err.message, 'error');
+                console.error(err);
+            }
+        }
+
+        // Success Celebration Timer
+        function showDeploymentCelebration() {
+            showLoader("Deployed Successfully! 🚀", "Site build triggered. Redirecting to live preview in 10s...");
+            
+            let secondsRemaining = 10;
+            const timerInterval = setInterval(() => {
+                secondsRemaining--;
+                if (secondsRemaining > 0) {
+                    showLoader("Deployed Successfully! 🚀", `Site build triggered. Your changes will be active in ${secondsRemaining}s...`);
+                } else {
+                    clearInterval(timerInterval);
+                    hideLoader();
+                    showAlert('Success', 'Web update completed! Check your live website portfolio.', 'success');
+                }
+            }, 1000);
+        }
+    </script>
+</body>
+
+</html>
