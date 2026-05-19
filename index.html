@@ -5,7 +5,7 @@
     <title>Md Jahid Hasan Emon | NOC Engineer</title>
     
     <!-- NOC Configuration / CMS Meta -->
-    <meta name="visitor-api" data-cms="visitor-api" content="https://script.google.com/macros/s/AKfycbxsLSqv5lYsiaCWiktH-ESlmFT-r3gJiPI-EabPh5qlmmZDIkVd6pwMPXqcKC--cNsc/exec">
+    <meta name="visitor-api" data-cms="visitor-api" content="https://script.google.com/macros/s/AKfycbySmuYaNIMJjCeBPXh9I_YyGPW3RcIaNNc1jFy4ABe62d6fulemSXENuzR2ldbkE34o/exec">
 
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&amp;family=Hind+Siliguri:wght@300;400;600;700&amp;display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
@@ -631,9 +631,6 @@
             const BACKEND_URL = apiMeta ? apiMeta.content : "";
             if (!BACKEND_URL || BACKEND_URL.trim() === "") return; // Disable if URL not set
 
-            // Robust multi-fallback raw IP address lookup
-            let ipAddress = "";
-
             // Simple User-Agent Parser for Browser and OS
             const ua = navigator.userAgent;
             let browser = "Unknown";
@@ -652,45 +649,89 @@
             else if (ua.includes("iPhone") || ua.includes("iPad")) os = "iOS";
             else if (ua.includes("Linux")) os = "Linux";
 
-            // Try 1: ipify (fast, standard raw IP finder)
+            let ipInfo = null;
+
+            // Try 1: get.geojs.io (Extremely reliable, bypassed by adblockers, gives complete location and ISP details!)
             try {
-                const res = await fetch('https://api.ipify.org?format=json').then(r => r.json());
-                if (res && res.ip) ipAddress = res.ip;
+                const res = await fetch('https://get.geojs.io/v1/ip/geo.json').then(r => r.json());
+                if (res && res.ip) {
+                    ipInfo = {
+                        ip: res.ip,
+                        isp: res.organization_name || res.organization || "Unknown",
+                        city: res.city || "Unknown",
+                        country: res.country || "Unknown"
+                    };
+                }
             } catch (e) {
-                console.warn('ipify failed, trying fallback...');
+                console.warn('geojs failed, trying fallback...');
             }
 
-            // Try 2: freeipapi (fallback IP finder)
-            if (!ipAddress) {
+            // Try 2: freeipapi.com (fallback)
+            if (!ipInfo) {
                 try {
                     const res = await fetch('https://freeipapi.com/api/json').then(r => r.json());
-                    if (res && res.ipAddress) ipAddress = res.ipAddress;
+                    if (res && res.ipAddress) {
+                        ipInfo = {
+                            ip: res.ipAddress,
+                            isp: res.asnOrganization || "Unknown",
+                            city: res.cityName || "Unknown",
+                            country: res.countryName || "Unknown"
+                        };
+                    }
                 } catch (e) {
-                    console.warn('freeipapi failed.');
+                    console.warn('freeipapi failed, trying fallback...');
                 }
             }
 
-            // Try 3: ipwho.is (fallback IP finder)
-            if (!ipAddress) {
+            // Try 3: ipwho.is (fallback)
+            if (!ipInfo) {
                 try {
                     const res = await fetch('https://ipwho.is/').then(r => r.json());
-                    if (res && res.ip) ipAddress = res.ip;
+                    if (res && res.success) {
+                        ipInfo = {
+                            ip: res.ip,
+                            isp: res.connection ? res.connection.isp : "Unknown",
+                            city: res.city || "Unknown",
+                            country: res.country || "Unknown"
+                        };
+                    }
                 } catch (e) {
-                    console.warn('ipwho.is failed.');
+                    console.warn('ipwho.is failed, trying fallback...');
                 }
             }
 
-            // Send to Google Apps Script (which will fetch geolocation server-side bypassing adblockers!)
-            if (ipAddress) {
+            // Try 4: ipify.org (raw IP fallback)
+            if (!ipInfo) {
+                try {
+                    const res = await fetch('https://api.ipify.org?format=json').then(r => r.json());
+                    if (res && res.ip) {
+                        ipInfo = {
+                            ip: res.ip,
+                            isp: "Unknown",
+                            city: "Unknown",
+                            country: "Unknown"
+                        };
+                    }
+                } catch (e) {
+                    console.warn('All IP lookups failed.');
+                }
+            }
+
+            // Send to Google Apps Script
+            if (ipInfo && ipInfo.ip) {
+                // Smart Hack: Merge Browser & OS into the ISP field so the existing Apps Script can store it without redeployment!
+                const mergedIsp = `${ipInfo.isp} | ${browser} on ${os}`;
+
                 try {
                     await fetch(BACKEND_URL, {
                         method: 'POST',
                         mode: 'no-cors',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({
-                            ip: ipAddress,
-                            browser: browser,
-                            os: os
+                            ip: ipInfo.ip,
+                            isp: mergedIsp,
+                            city: ipInfo.city,
+                            country: ipInfo.country
                         })
                     });
                 } catch (e) {
