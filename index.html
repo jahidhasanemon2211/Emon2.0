@@ -89,6 +89,15 @@
             transition: transform 0.1s;
         }
 
+        @media (max-width: 768px) {
+            #custom-cursor {
+                display: none !important;
+            }
+            body {
+                cursor: auto;
+            }
+        }
+
         /* Animated Text Gradient */
         .text-glow {
             background: linear-gradient(135deg, #fff 0%, #6366f1 100%);
@@ -164,7 +173,15 @@
                 <a href="#contact" class="px-5 py-2 bg-indigo-600 rounded-full hover:bg-indigo-500 transition shadow-lg shadow-indigo-500/20">LET'S
                     TALK</a>
             </div>
-            <button class="md:hidden text-2xl" onclick="toggleMenu()"><i class="fas fa-bars"></i></button>
+            <button class="md:hidden text-2xl focus:outline-none" onclick="toggleMenu()"><i class="fas fa-bars"></i></button>
+        </div>
+
+        <!-- Mobile Menu Dropdown -->
+        <div id="mobileMenu" class="hidden md:hidden absolute top-24 left-6 right-6 bento-card p-6 flex-col space-y-4 shadow-2xl origin-top transition-all duration-300">
+            <a href="#home" onclick="toggleMenu()" class="font-bold text-center tracking-widest hover:text-indigo-400 py-2 border-b border-white/5">HOME</a>
+            <a href="#skills" onclick="toggleMenu()" class="font-bold text-center tracking-widest hover:text-indigo-400 py-2 border-b border-white/5">SKILLS</a>
+            <a href="#projects" onclick="toggleMenu()" class="font-bold text-center tracking-widest hover:text-indigo-400 py-2 border-b border-white/5">WORK</a>
+            <a href="#contact" onclick="toggleMenu()" class="font-bold text-center tracking-widest text-indigo-400 py-2">LET'S TALK</a>
         </div>
     </nav>
 
@@ -172,7 +189,7 @@
         <div class="max-w-6xl mx-auto grid lg:grid-cols-2 gap-12 items-center">
             <div class="z-10" data-aos="fade-right">
                 <span data-cms="hero-badge" class="inline-block py-1 px-4 rounded-full border border-indigo-500/30 bg-indigo-500/10 text-indigo-400 text-xs font-bold tracking-widest mb-6">NOC ENGINEER</span>
-                <h1 data-cms="hero-title" class="text-6xl md:text-8xl font-extrabold leading-none mb-6">Keeping <span class="text-glow">Networks</span> Connected.</h1>
+                <h1 data-cms="hero-title" class="text-5xl md:text-8xl font-extrabold leading-none mb-6">Keeping <span class="text-glow">Networks</span> Connected.</h1>
                 <p data-cms="hero-desc" class="text-gray-400 text-lg md:text-xl max-w-lg mb-10 leading-relaxed">আমি <span class="text-white font-bold">মো: জাহিদ হাসান ইমন</span>, বর্তমানে দেশব্যাপী বিস্তৃত আইএসপি (Nationwide ISP)-তে একজন IT Support and NOC Engineer হিসেবে কর্মরত আছি । সিসকো ও মাইক্রোটিক টেকনোলজির মাধ্যমে নেটওয়ার্ক ইনফ্রাস্ট্রাকচার নিখুঁতভাবে মনিটরিং করা, ওএলটি (OLT) ও সুইচ কনফিগার করা এবং যেকোনো জটিল টেকনিক্যাল ইস্যু দ্রুত সমাধান করাই আমার মূল কাজ । নেটওয়ার্কিং ও আধুনিক প্রযুক্তির সমন্বয়ে সিস্টেমকে সর্বোচ্চ দক্ষ করে তোলাই আমার প্যাশন।</p>
                 <div class="flex flex-wrap gap-5">
                     <a data-cms="resume-link" href="Emon_CV.pdf" target="_blank" class="px-8 py-4 bg-indigo-600 rounded-2xl font-bold text-white hover:scale-105 transition-transform flex items-center gap-3">
@@ -465,6 +482,21 @@
             duration: 1.5,
             ease: "expo.out"
         });
+
+        // Mobile Menu Toggle
+        function toggleMenu() {
+            const menu = document.getElementById('mobileMenu');
+            if (menu.classList.contains('hidden')) {
+                menu.classList.remove('hidden');
+                menu.classList.add('flex');
+                gsap.fromTo(menu, { opacity: 0, y: -20 }, { opacity: 1, y: 0, duration: 0.3 });
+            } else {
+                gsap.to(menu, { opacity: 0, y: -20, duration: 0.3, onComplete: () => {
+                    menu.classList.add('hidden');
+                    menu.classList.remove('flex');
+                }});
+            }
+        }
     </script>
 
 
