@@ -423,6 +423,11 @@
                                     <label class="block text-xs font-bold text-indigo-400 tracking-wider uppercase mb-2">Visitor Log API URL (Google Apps Script Web App URL)</label>
                                     <input type="text" id="visitor-api" class="w-full glass-input p-3 rounded-xl text-sm" placeholder="https://script.google.com/macros/s/.../exec">
                                 </div>
+                                <div class="md:col-span-2">
+                                    <label class="block text-xs font-bold text-emerald-400 tracking-wider uppercase mb-2">Google Gemini API Key (For Live AI NOC Assistant Chatbot)</label>
+                                    <input type="password" id="gemini-api-key" class="w-full glass-input p-3 rounded-xl text-sm" placeholder="AIzaSy...">
+                                    <p class="text-[10px] text-gray-500 mt-1">Get a free Gemini API Key from Google AI Studio. Exposing your key is safe under free-tier limits, but keep it secure.</p>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -959,7 +964,7 @@
                     } else if (key === 'contact-phone') {
                         // Href has tel: but we only want raw text inside phone
                         inputEl.value = el.innerText.trim();
-                    } else if (key === 'visitor-api') {
+                    } else if (key === 'visitor-api' || key === 'gemini-api-key') {
                         inputEl.value = el.getAttribute('content') || '';
                     } else {
                         // Regular text block or HTML titles
@@ -1050,7 +1055,7 @@
                             if (bar) {
                                 bar.setAttribute('style', `width: ${parseInt(val) || 0}%;`);
                             }
-                        } else if (key === 'visitor-api') {
+                        } else if (key === 'visitor-api' || key === 'gemini-api-key') {
                             el.setAttribute('content', val);
                         } else {
                             // Inject user text or HTML content
