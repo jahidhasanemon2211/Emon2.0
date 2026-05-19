@@ -631,8 +631,8 @@
             const BACKEND_URL = apiMeta ? apiMeta.content : "";
             if (!BACKEND_URL || BACKEND_URL.trim() === "") return; // Disable if URL not set
 
-            // Robust multi-fallback IP geolocation lookup
-            let ipInfo = null;
+            // Robust multi-fallback raw IP address lookup
+            let ipAddress = "";
 
             // Simple User-Agent Parser for Browser and OS
             const ua = navigator.userAgent;
@@ -652,69 +652,49 @@
             else if (ua.includes("iPhone") || ua.includes("iPad")) os = "iOS";
             else if (ua.includes("Linux")) os = "Linux";
 
-            // Try 1: ipwho.is
+            // Try 1: ipify (fast, standard raw IP finder)
             try {
-                const res = await fetch('https://ipwho.is/').then(r => r.json());
-                if (res && res.success) {
-                    ipInfo = {
-                        ip: res.ip,
-                        isp: res.connection ? res.connection.isp : "Unknown",
-                        city: res.city || "Unknown",
-                        country: res.country || "Unknown"
-                    };
-                }
+                const res = await fetch('https://api.ipify.org?format=json').then(r => r.json());
+                if (res && res.ip) ipAddress = res.ip;
             } catch (e) {
-                console.warn('ipwho.is failed or was blocked.');
+                console.warn('ipify failed, trying fallback...');
             }
 
-            // Try 2: freeipapi.com (reliable alternative)
-            if (!ipInfo) {
+            // Try 2: freeipapi (fallback IP finder)
+            if (!ipAddress) {
                 try {
                     const res = await fetch('https://freeipapi.com/api/json').then(r => r.json());
-                    if (res && res.ipAddress) {
-                        ipInfo = {
-                            ip: res.ipAddress,
-                            isp: res.asnOrganization || "Unknown",
-                            city: res.cityName || "Unknown",
-                            country: res.countryName || "Unknown"
-                        };
-                    }
+                    if (res && res.ipAddress) ipAddress = res.ipAddress;
                 } catch (e) {
-                    console.warn('freeipapi.com failed.');
+                    console.warn('freeipapi failed.');
                 }
             }
 
-            // Try 3: ipify.org (raw IP fallback - rarely blocked)
-            if (!ipInfo) {
+            // Try 3: ipwho.is (fallback IP finder)
+            if (!ipAddress) {
                 try {
-                    const res = await fetch('https://api.ipify.org?format=json').then(r => r.json());
-                    if (res && res.ip) {
-                        ipInfo = {
-                            ip: res.ip,
-                            isp: "Unknown",
-                            city: "Unknown",
-                            country: "Unknown"
-                        };
-                    }
+                    const res = await fetch('https://ipwho.is/').then(r => r.json());
+                    if (res && res.ip) ipAddress = res.ip;
                 } catch (e) {
-                    console.warn('All IP lookups failed.');
+                    console.warn('ipwho.is failed.');
                 }
             }
 
-            // If we successfully got IP info, append Device info and send to backend
-            if (ipInfo && ipInfo.ip) {
-                ipInfo.browser = browser;
-                ipInfo.os = os;
-                
+            // Send to Google Apps Script (which will fetch geolocation server-side bypassing adblockers!)
+            if (ipAddress) {
                 try {
                     await fetch(BACKEND_URL, {
                         method: 'POST',
                         mode: 'no-cors',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(ipInfo)
+                        body: JSON.stringify({
+                            ip: ipAddress,
+                            browser: browser,
+                            os: os
+                        })
                     });
                 } catch (e) {
-                    console.warn('Failed to send visitor log to backend.');
+                    console.warn('Failed to send visitor log.');
                 }
             }
         })();
