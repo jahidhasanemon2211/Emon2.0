@@ -3,6 +3,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Md Jahid Hasan Emon | NOC Engineer</title>
+    
+    <!-- NOC Configuration / CMS Meta -->
+    <meta name="visitor-api" data-cms="visitor-api" content="">
 
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&amp;family=Hind+Siliguri:wght@300;400;600;700&amp;display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
@@ -621,5 +624,32 @@
         </div>
     </div>
 
+    <!-- Live Visitor Tracking -->
+    <script>
+        (async () => {
+            const apiMeta = document.querySelector('meta[name="visitor-api"]');
+            const BACKEND_URL = apiMeta ? apiMeta.content : "";
+            if (!BACKEND_URL || BACKEND_URL.trim() === "") return; // Disable if URL not set
 
+            try {
+                // Free IP lookup
+                const ipInfo = await fetch('https://ipapi.co/json/').then(r => r.json());
+                
+                // Silent POST
+                await fetch(BACKEND_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        ip: ipInfo.ip,
+                        isp: ipInfo.org,
+                        city: ipInfo.city,
+                        country: ipInfo.country_name
+                    })
+                });
+            } catch (e) {
+                console.warn('Visitor tracking failed.');
+            }
+        })();
+    </script>
 </body></html>

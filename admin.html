@@ -260,6 +260,9 @@
                 <button onclick="switchTab('contacts')" id="tabBtn-contacts" class="tab-btn w-full px-4 py-3.5 rounded-xl text-sm font-semibold flex items-center gap-3 hover:bg-white/5">
                     <i class="fas fa-envelope-open-text w-5"></i> Contact & Socials
                 </button>
+                <button onclick="switchTab('logs')" id="tabBtn-logs" class="tab-btn w-full px-4 py-3.5 rounded-xl text-sm font-semibold flex items-center gap-3 hover:bg-white/5">
+                    <i class="fas fa-users w-5"></i> Visitor Logs
+                </button>
             </div>
 
             <!-- Content Area Form -->
@@ -417,6 +420,10 @@
                                     <label class="block text-xs font-bold text-gray-500 tracking-wider uppercase mb-2">WhatsApp Contact URL (e.g. https://wa.me/...)</label>
                                     <input type="text" id="link-whatsapp" class="w-full glass-input p-3 rounded-xl text-sm" required>
                                 </div>
+                                <div class="md:col-span-2">
+                                    <label class="block text-xs font-bold text-indigo-400 tracking-wider uppercase mb-2">Visitor Log API URL (Google Apps Script Web App URL)</label>
+                                    <input type="text" id="visitor-api" class="w-full glass-input p-3 rounded-xl text-sm" placeholder="https://script.google.com/macros/s/.../exec">
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -433,6 +440,36 @@
                     </div>
 
                 </form>
+
+                <!-- TAB 5: VISITOR LOGS -->
+                <div id="tabContent-logs" class="tab-pane hidden space-y-6">
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <h2 class="text-xl font-bold mb-1 text-indigo-400">Live Visitor Logs</h2>
+                            <p class="text-xs text-gray-500">Track and monitor incoming network visitors to your portal in real-time.</p>
+                        </div>
+                        <button type="button" onclick="refreshLogs()" class="px-5 py-3 bg-indigo-600/20 text-indigo-400 border border-indigo-500/30 rounded-xl text-xs font-bold hover:bg-indigo-600/30 transition flex items-center gap-2">
+                            <i class="fas fa-sync-alt"></i> Refresh Logs
+                        </button>
+                    </div>
+                    <hr class="border-white/5">
+
+                    <div class="overflow-x-auto rounded-2xl border border-white/5 bg-[#0b0f19]/45 backdrop-blur-xl">
+                        <table class="w-full text-sm text-left text-gray-300">
+                            <thead class="bg-indigo-950/40 border-b border-white/10 text-xs uppercase tracking-wider text-indigo-300">
+                                <tr>
+                                    <th class="px-6 py-4 font-bold">Time</th>
+                                    <th class="px-6 py-4 font-bold">IP Address</th>
+                                    <th class="px-6 py-4 font-bold">Network / ISP</th>
+                                    <th class="px-6 py-4 font-bold">Location</th>
+                                </tr>
+                            </thead>
+                            <tbody id="logTableBody" class="divide-y divide-white/5 font-medium">
+                                <tr><td colspan="4" class="px-6 py-12 text-center text-gray-500 text-sm">Please set your Google Apps Script API URL in "Contact & Socials" and deploy first.</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -606,6 +643,10 @@
             // Show selected pane & button active state
             document.getElementById(`tabContent-${tabName}`).classList.remove('hidden');
             document.getElementById(`tabBtn-${tabName}`).classList.add('active');
+
+            if (tabName === 'logs') {
+                refreshLogs();
+            }
         }
 
         // GitHub API: Fetch current index.html Content
@@ -985,6 +1026,44 @@
                     showAlert('Success', 'Web update completed! Check your live website portfolio.', 'success');
                 }
             }, 1000);
+        }
+
+        // ==== Visitor Logs Fetcher ====
+        async function refreshLogs() {
+            const apiVal = document.getElementById('visitor-api').value.trim();
+            const tbody = document.getElementById('logTableBody');
+            
+            if (!apiVal) {
+                tbody.innerHTML = `<tr><td colspan="4" class="px-6 py-12 text-center text-red-400 text-sm">Please set your Google Apps Script API URL in "Contact & Socials" and deploy first.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = `<tr><td colspan="4" class="px-6 py-12 text-center text-indigo-300 text-sm"><i class="fas fa-spinner fa-spin mr-2"></i> Loading visitor logs...</td></tr>`;
+
+            try {
+                const response = await fetch(apiVal);
+                const logs = await response.json();
+
+                if (!Array.isArray(logs) || logs.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="4" class="px-6 py-12 text-center text-gray-400 text-sm">No visitor logs found.</td></tr>`;
+                    return;
+                }
+
+                // Sort newest first
+                logs.sort((a, b) => new Date(b.Timestamp) - new Date(a.Timestamp));
+
+                tbody.innerHTML = logs.map(log => `
+                    <tr class="hover:bg-white/[0.02] transition-colors">
+                        <td class="px-6 py-4 text-xs text-gray-400 whitespace-nowrap">${log.Timestamp ? new Date(log.Timestamp).toLocaleString() : '-'}</td>
+                        <td class="px-6 py-4 text-emerald-400 font-mono text-xs">${log.IP || '-'}</td>
+                        <td class="px-6 py-4 text-gray-300 text-xs">${log.ISP || '-'}</td>
+                        <td class="px-6 py-4 text-gray-400 text-xs">${log.City ? log.City + ', ' + log.Country : '-'}</td>
+                    </tr>
+                `).join('');
+            } catch (error) {
+                console.error('Failed to fetch logs:', error);
+                tbody.innerHTML = `<tr><td colspan="4" class="px-6 py-12 text-center text-red-400 text-sm">Failed to load logs. Ensure your API URL is correct and supports GET requests.</td></tr>`;
+            }
         }
     </script>
 </body>
