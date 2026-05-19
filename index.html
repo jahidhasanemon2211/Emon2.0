@@ -134,7 +134,159 @@
             pointer-events: none;
             z-index: 999;
         }
+
+        /* LIGHT MODE OVERRIDES */
+        :root.light-mode {
+            --bg-dark: #f8fafc;
+            --glass: rgba(255, 255, 255, 0.75);
+            --border: rgba(15, 23, 42, 0.08);
+            --accent: #4f46e5;
+            --accent-glow: rgba(79, 70, 229, 0.15);
+        }
+
+        .light-mode body {
+            background-color: var(--bg-dark);
+            color: #1e293b;
+        }
+
+        .light-mode .mesh-gradient {
+            background: radial-gradient(circle at 50% 50%, #e0e7ff 0%, #f1f5f9 100%);
+        }
+
+        .light-mode .orb {
+            opacity: 0.15;
+            filter: blur(100px);
+        }
+
+        .light-mode .bento-card {
+            background: var(--glass);
+            border-color: var(--border);
+            box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.05), 0 2px 10px -1px rgba(15, 23, 42, 0.03);
+        }
+
+        .light-mode .bento-card:hover {
+            box-shadow: 0 20px 40px rgba(15, 23, 42, 0.08), 0 0 20px var(--accent-glow);
+            border-color: var(--accent);
+        }
+
+        .light-mode .text-glow {
+            background: linear-gradient(135deg, #0f172a 0%, #4f46e5 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 0 10px rgba(79, 70, 229, 0.1));
+        }
+
+        /* Override utility color classes in light mode */
+        .light-mode .text-white,
+        .light-mode .text-gray-100 {
+            color: #0f172a !important;
+        }
+
+        .light-mode .text-gray-300 {
+            color: #334155 !important;
+        }
+
+        .light-mode .text-gray-400 {
+            color: #475569 !important;
+        }
+
+        .light-mode .text-gray-500 {
+            color: #64748b !important;
+        }
+
+        .light-mode .text-indigo-400 {
+            color: #4f46e5 !important;
+        }
+
+        .light-mode .bg-white\/5 {
+            background-color: rgba(15, 23, 42, 0.04) !important;
+        }
+
+        .light-mode .bg-white\/10 {
+            background-color: rgba(15, 23, 42, 0.08) !important;
+        }
+
+        .light-mode .bg-white\/80 {
+            background-color: rgba(255, 255, 255, 0.8) !important;
+        }
+
+        .light-mode .bg-indigo-500\/10 {
+            background-color: rgba(79, 70, 229, 0.1) !important;
+        }
+
+        .light-mode .border-white\/5 {
+            border-color: rgba(15, 23, 42, 0.04) !important;
+        }
+
+        .light-mode .border-white\/10 {
+            border-color: rgba(15, 23, 42, 0.08) !important;
+        }
+
+        .light-mode .bg-black\/20 {
+            background-color: rgba(15, 23, 42, 0.02) !important;
+        }
+
+        .light-mode .bg-black\/50 {
+            background-color: rgba(255, 255, 255, 0.5) !important;
+        }
+
+        .light-mode .bg-black\/80 {
+            background-color: rgba(255, 255, 255, 0.8) !important;
+        }
+
+        .light-mode .bg-\[\#0b0f19\]\/95 {
+            background-color: rgba(255, 255, 255, 0.95) !important;
+        }
+
+        /* Specific style adjustments */
+        .light-mode #mobileMenu {
+            background: rgba(255, 255, 255, 0.95) !important;
+            border-color: rgba(15, 23, 42, 0.08) !important;
+        }
+
+        .light-mode #cvModal .bento-card {
+            background-color: rgba(255, 255, 255, 0.98) !important;
+            border-color: rgba(15, 23, 42, 0.1) !important;
+        }
+
+        .light-mode .noise {
+            opacity: 0.015; /* Subtler noise in light mode */
+        }
+        
+        .light-mode .grayscale {
+            filter: grayscale(0.5);
+        }
+        
+        .light-mode .grayscale:hover {
+            filter: grayscale(0);
+        }
+
+        .light-mode #contactForm input,
+        .light-mode #contactForm textarea {
+            background-color: rgba(15, 23, 42, 0.04) !important;
+            border-color: rgba(15, 23, 42, 0.08) !important;
+            color: #0f172a !important;
+        }
+        
+        .light-mode #contactForm input::placeholder,
+        .light-mode #contactForm textarea::placeholder {
+            color: #64748b !important;
+        }
+
+        .light-mode #contactForm input:focus,
+        .light-mode #contactForm textarea:focus {
+            border-color: #4f46e5 !important;
+        }
     </style>
+    <script>
+        // Init theme early to avoid flicker
+        (function() {
+            const savedTheme = localStorage.getItem('theme') || 'dark';
+            if (savedTheme === 'light') {
+                document.documentElement.classList.add('light-mode');
+            }
+        })();
+    </script>
 </head>
 
 <body>
@@ -159,9 +311,17 @@
                 <a href="#contact"
                     class="px-5 py-2 bg-indigo-600 rounded-full hover:bg-indigo-500 transition shadow-lg shadow-indigo-500/20">LET'S
                     TALK</a>
+                <button onclick="toggleTheme()" class="w-10 h-10 rounded-full flex items-center justify-center bg-white/5 border border-white/10 hover:bg-white/10 transition text-gray-300 hover:text-white theme-toggle-btn">
+                    <i class="fas fa-moon"></i>
+                </button>
             </div>
-            <button class="md:hidden text-2xl focus:outline-none" onclick="toggleMenu()"><i
-                    class="fas fa-bars"></i></button>
+            <div class="flex items-center gap-3 md:hidden">
+                <button onclick="toggleTheme()" class="w-10 h-10 rounded-full flex items-center justify-center bg-white/5 border border-white/10 hover:bg-white/10 transition text-gray-300 hover:text-white theme-toggle-btn">
+                    <i class="fas fa-moon"></i>
+                </button>
+                <button class="text-2xl focus:outline-none" onclick="toggleMenu()"><i
+                        class="fas fa-bars"></i></button>
+            </div>
         </div>
 
         <!-- Mobile Menu Dropdown -->
@@ -711,6 +871,25 @@
 
     <!-- Live Visitor Tracking -->
     <script>
+        function toggleTheme() {
+            const isLight = document.documentElement.classList.toggle('light-mode');
+            localStorage.setItem('theme', isLight ? 'light' : 'dark');
+            updateThemeIcons(isLight);
+        }
+
+        function updateThemeIcons(isLight) {
+            const btns = document.querySelectorAll('.theme-toggle-btn');
+            btns.forEach(btn => {
+                btn.innerHTML = isLight ? '<i class="fas fa-sun text-yellow-500"></i>' : '<i class="fas fa-moon"></i>';
+            });
+        }
+
+        // Initialize icons state on DOM load
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme') || 'dark';
+            updateThemeIcons(savedTheme === 'light');
+        });
+
         (async () => {
             const apiMeta = document.querySelector('meta[name="visitor-api"]');
             const BACKEND_URL = apiMeta ? apiMeta.content : "";
