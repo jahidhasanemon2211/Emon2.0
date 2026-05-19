@@ -28,8 +28,6 @@
             background-color: var(--bg-dark);
             color: #f3f4f6;
             overflow-x: hidden;
-            cursor: none;
-            /* Custom cursor implementation */
         }
 
         /* 2026 Mesh Background Animation */
@@ -79,27 +77,7 @@
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), 0 0 20px var(--accent-glow);
         }
 
-        /* Interactive Cursor */
-        #custom-cursor {
-            width: 20px;
-            height: 20px;
-            background: white;
-            border-radius: 50%;
-            position: fixed;
-            pointer-events: none;
-            z-index: 9999;
-            mix-blend-mode: difference;
-            transition: transform 0.1s;
-        }
 
-        @media (max-width: 768px) {
-            #custom-cursor {
-                display: none !important;
-            }
-            body {
-                cursor: auto;
-            }
-        }
 
         /* Animated Text Gradient */
         .text-glow {
@@ -156,7 +134,7 @@
 
 <body>
 
-    <div id="custom-cursor"></div>
+
     <div class="noise"></div>
     <div class="mesh-gradient">
         <div class="orb w-[500px] h-[500px] bg-indigo-600 top-[-10%] left-[-10%]"></div>
@@ -392,26 +370,7 @@
             }
         });
 
-        // Custom Cursor Logic
-        const cursor = document.getElementById('custom-cursor');
-        document.addEventListener('mousemove', (e) => {
-            gsap.to(cursor, {
-                x: e.clientX - 10,
-                y: e.clientY - 10,
-                duration: 0.2,
-                ease: "power2.out"
-            });
-        });
 
-        // Hover Effect on Cursor for Interactive Elements
-        document.querySelectorAll('a, button, input, textarea').forEach(el => {
-            el.addEventListener('mouseenter', () => {
-                gsap.to(cursor, { scale: 3, opacity: 0.3, background: '#6366f1' });
-            });
-            el.addEventListener('mouseleave', () => {
-                gsap.to(cursor, { scale: 1, opacity: 1, background: 'white' });
-            });
-        });
 
         // Form Submission to Google Sheet
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzZgLUUDzhOJEuBXFq_WAwPQ24CpgniHpUiQcsCdAg-eNtagsI6gT07SzipihEo_es_fQ/exec'; // Replace with your published Apps Script Web App URL
