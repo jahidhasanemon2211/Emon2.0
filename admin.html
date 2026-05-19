@@ -1071,6 +1071,12 @@
                             browserName = deviceParts[0] || 'Unknown';
                             osName = deviceParts[1] || 'Unknown';
                         }
+                    } else {
+                        // Clean up merged data from ISP field if dedicated values are present
+                        const ispParts = (log.ISP || '').split(' | ');
+                        if (ispParts.length > 1) {
+                            ispName = ispParts[0];
+                        }
                     }
 
                     return `

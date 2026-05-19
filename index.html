@@ -719,7 +719,8 @@
 
             // Send to Google Apps Script
             if (ipInfo && ipInfo.ip) {
-                // Smart Hack: Merge Browser & OS into the ISP field so the existing Apps Script can store it without redeployment!
+                // Smart Hack: Merge Browser & OS into the ISP field for legacy compatibility,
+                // and also send browser and os as dedicated fields for modern Apps Script support!
                 const mergedIsp = `${ipInfo.isp} | ${browser} on ${os}`;
 
                 try {
@@ -731,7 +732,9 @@
                             ip: ipInfo.ip,
                             isp: mergedIsp,
                             city: ipInfo.city,
-                            country: ipInfo.country
+                            country: ipInfo.country,
+                            browser: browser,
+                            os: os
                         })
                     });
                 } catch (e) {
