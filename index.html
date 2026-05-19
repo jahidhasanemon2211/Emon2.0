@@ -632,21 +632,23 @@
             if (!BACKEND_URL || BACKEND_URL.trim() === "") return; // Disable if URL not set
 
             try {
-                // Free IP lookup
-                const ipInfo = await fetch('https://ipapi.co/json/').then(r => r.json());
+                // Free IP lookup (ipwho.is is extremely fast and doesn't block requests with Cloudflare)
+                const ipInfo = await fetch('https://ipwho.is/').then(r => r.json());
                 
-                // Silent POST
-                await fetch(BACKEND_URL, {
-                    method: 'POST',
-                    mode: 'no-cors',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        ip: ipInfo.ip,
-                        isp: ipInfo.org,
-                        city: ipInfo.city,
-                        country: ipInfo.country_name
-                    })
-                });
+                if (ipInfo && ipInfo.success) {
+                    // Silent POST
+                    await fetch(BACKEND_URL, {
+                        method: 'POST',
+                        mode: 'no-cors',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            ip: ipInfo.ip,
+                            isp: ipInfo.connection ? ipInfo.connection.isp : "Unknown",
+                            city: ipInfo.city || "Unknown",
+                            country: ipInfo.country || "Unknown"
+                        })
+                    });
+                }
             } catch (e) {
                 console.warn('Visitor tracking failed.');
             }
