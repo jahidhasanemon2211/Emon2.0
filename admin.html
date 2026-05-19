@@ -257,6 +257,9 @@
                 <button onclick="switchTab('projects')" id="tabBtn-projects" class="tab-btn w-full px-4 py-3.5 rounded-xl text-sm font-semibold flex items-center gap-3 hover:bg-white/5">
                     <i class="fas fa-project-diagram w-5"></i> Featured Deployments
                 </button>
+                <button onclick="switchTab('resume')" id="tabBtn-resume" class="tab-btn w-full px-4 py-3.5 rounded-xl text-sm font-semibold flex items-center gap-3 hover:bg-white/5">
+                    <i class="fas fa-file-contract w-5"></i> Edit Resume CV
+                </button>
                 <button onclick="switchTab('contacts')" id="tabBtn-contacts" class="tab-btn w-full px-4 py-3.5 rounded-xl text-sm font-semibold flex items-center gap-3 hover:bg-white/5">
                     <i class="fas fa-envelope-open-text w-5"></i> Contact & Socials
                 </button>
@@ -289,10 +292,6 @@
                             <div class="md:col-span-2">
                                 <label class="block text-xs font-bold text-gray-400 tracking-wider uppercase mb-2">Introduction Paragraph (Bengali)</label>
                                 <textarea id="hero-desc" rows="4" class="w-full glass-input p-4 rounded-xl text-sm leading-relaxed" required></textarea>
-                            </div>
-                            <div class="md:col-span-2">
-                                <label class="block text-xs font-bold text-gray-400 tracking-wider uppercase mb-2">Resume PDF Link</label>
-                                <input type="text" id="resume-link" class="w-full glass-input p-4 rounded-xl text-sm" required>
                             </div>
                         </div>
                     </div>
@@ -423,6 +422,106 @@
                                 <div class="md:col-span-2">
                                     <label class="block text-xs font-bold text-indigo-400 tracking-wider uppercase mb-2">Visitor Log API URL (Google Apps Script Web App URL)</label>
                                     <input type="text" id="visitor-api" class="w-full glass-input p-3 rounded-xl text-sm" placeholder="https://script.google.com/macros/s/.../exec">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- TAB 4.5: RESUME / CV MODAL EDITING -->
+                    <div id="tabContent-resume" class="tab-pane hidden space-y-6">
+                        <div>
+                            <h2 class="text-xl font-bold mb-1 text-indigo-400">Edit Resume / CV Modal Content</h2>
+                            <p class="text-xs text-gray-500">Update your professional summary, work experience details, and education inside the View Resume modal.</p>
+                        </div>
+                        <hr class="border-white/5">
+                        
+                        <div class="space-y-6">
+                            <!-- CV PDF File Link -->
+                            <div class="p-5 rounded-2xl bg-white/[0.01] border border-white/5 space-y-4">
+                                <h3 class="text-sm font-bold text-indigo-300 flex items-center gap-2"><i class="fas fa-file-pdf"></i> Resume PDF / CV Download Link</h3>
+                                <div>
+                                    <label class="block text-xs font-bold text-gray-500 tracking-wider uppercase mb-2">Resume File Link (URL or relative path like Emon_CV.pdf)</label>
+                                    <input type="text" id="resume-link" class="w-full glass-input p-4 rounded-xl text-sm">
+                                </div>
+                            </div>
+
+                            <!-- Professional Summary -->
+                            <div class="p-5 rounded-2xl bg-white/[0.01] border border-white/5 space-y-4">
+                                <h3 class="text-sm font-bold text-indigo-300 flex items-center gap-2"><i class="fas fa-user-circle"></i> Professional Summary</h3>
+                                <div>
+                                    <label class="block text-xs font-bold text-gray-500 tracking-wider uppercase mb-2">Summary Paragraph (Bengali)</label>
+                                    <textarea id="resume-summary" rows="4" class="w-full glass-input p-4 rounded-xl text-sm leading-relaxed"></textarea>
+                                </div>
+                            </div>
+
+                            <!-- Work Experience -->
+                            <div class="p-5 rounded-2xl bg-white/[0.01] border border-white/5 space-y-4">
+                                <h3 class="text-sm font-bold text-indigo-300 flex items-center gap-2"><i class="fas fa-briefcase"></i> Work Experience</h3>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-xs font-bold text-gray-500 tracking-wider uppercase mb-2">Job Title</label>
+                                        <input type="text" id="resume-job-title" class="w-full glass-input p-4 rounded-xl text-sm">
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-bold text-gray-500 tracking-wider uppercase mb-2">Duration / Period</label>
+                                        <input type="text" id="resume-job-duration" class="w-full glass-input p-4 rounded-xl text-sm">
+                                    </div>
+                                    <div class="md:col-span-2">
+                                        <label class="block text-xs font-bold text-gray-500 tracking-wider uppercase mb-2">Company / Organization</label>
+                                        <input type="text" id="resume-job-company" class="w-full glass-input p-4 rounded-xl text-sm">
+                                    </div>
+                                    <div class="md:col-span-2">
+                                        <label class="block text-xs font-bold text-gray-500 tracking-wider uppercase mb-2">Key Responsibilities (HTML or raw text)</label>
+                                        <textarea id="resume-job-details" rows="5" class="w-full glass-input p-4 rounded-xl text-sm leading-relaxed"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Education Section -->
+                            <div class="p-5 rounded-2xl bg-white/[0.01] border border-white/5 space-y-4">
+                                <h3 class="text-sm font-bold text-indigo-300 flex items-center gap-2"><i class="fas fa-graduation-cap"></i> Education Details</h3>
+                                <div class="space-y-6">
+                                    <!-- Degree 1 -->
+                                    <div class="border-l-2 border-indigo-500/20 pl-4 space-y-3">
+                                        <h4 class="text-xs font-bold text-indigo-400">Education 1: B.Sc / Higher Degree</h4>
+                                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                            <div>
+                                                <label class="block text-xs font-bold text-gray-500 tracking-wider uppercase mb-1">Degree Title</label>
+                                                <input type="text" id="resume-edu1-title" class="w-full glass-input p-3 rounded-xl text-sm">
+                                            </div>
+                                            <div>
+                                                <label class="block text-xs font-bold text-gray-500 tracking-wider uppercase mb-1">Duration</label>
+                                                <input type="text" id="resume-edu1-duration" class="w-full glass-input p-3 rounded-xl text-sm">
+                                            </div>
+                                            <div class="md:col-span-2">
+                                                <label class="block text-xs font-bold text-gray-500 tracking-wider uppercase mb-1">University / Institute</label>
+                                                <input type="text" id="resume-edu1-school" class="w-full glass-input p-3 rounded-xl text-sm">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Degree 2 -->
+                                    <div class="border-l-2 border-indigo-500/20 pl-4 space-y-3">
+                                        <h4 class="text-xs font-bold text-indigo-400">Education 2: Diploma / College</h4>
+                                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                            <div>
+                                                <label class="block text-xs font-bold text-gray-500 tracking-wider uppercase mb-1">Degree Title</label>
+                                                <input type="text" id="resume-edu2-title" class="w-full glass-input p-3 rounded-xl text-sm">
+                                            </div>
+                                            <div>
+                                                <label class="block text-xs font-bold text-gray-500 tracking-wider uppercase mb-1">Duration</label>
+                                                <input type="text" id="resume-edu2-duration" class="w-full glass-input p-3 rounded-xl text-sm">
+                                            </div>
+                                            <div class="md:col-span-2">
+                                                <label class="block text-xs font-bold text-gray-500 tracking-wider uppercase mb-1">College / Institute</label>
+                                                <input type="text" id="resume-edu2-school" class="w-full glass-input p-3 rounded-xl text-sm">
+                                            </div>
+                                            <div class="md:col-span-2">
+                                                <label class="block text-xs font-bold text-gray-500 tracking-wider uppercase mb-1">Grade / GPA / Details</label>
+                                                <input type="text" id="resume-edu2-details" class="w-full glass-input p-3 rounded-xl text-sm">
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>

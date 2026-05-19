@@ -426,11 +426,10 @@
                     }, 3000);
                 });
         });
-
-        // Initialize AOS
     </script>
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     <script>
+        // Initialize AOS
         AOS.init({
             duration: 1200,
             once: false,
@@ -489,7 +488,7 @@
                     <p class="text-indigo-400 font-semibold tracking-wider mt-1">IT Support &amp; NOC Engineer</p>
                 </div>
                 <div class="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-start">
-                    <a href="Emon_CV.pdf" download="Emon_CV.pdf" class="px-5 py-2.5 bg-indigo-600 rounded-xl font-bold text-sm text-white hover:bg-indigo-500 transition-all flex items-center gap-2">
+                    <a data-cms="resume-link" href="Emon_CV.pdf" download="Emon_CV.pdf" class="px-5 py-2.5 bg-indigo-600 rounded-xl font-bold text-sm text-white hover:bg-indigo-500 transition-all flex items-center gap-2">
                         <i class="fas fa-download"></i> Download CV
                     </a>
                     <button onclick="closeCVModal()" class="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-gray-400 hover:text-white hover:bg-white/10 transition">
@@ -503,7 +502,7 @@
                 <!-- Profile Summary -->
                 <div>
                     <h3 class="text-lg font-bold text-indigo-400 uppercase tracking-widest mb-3 flex items-center gap-2"><i class="fas fa-user-circle"></i> Professional Summary</h3>
-                    <p class="text-gray-300 leading-relaxed text-sm md:text-base">
+                    <p data-cms="resume-summary" class="text-gray-300 leading-relaxed text-sm md:text-base">
                         আমি একজন প্যাশনেট এবং পরিশ্রমী নেটওয়ার্ক ও এনওসি (NOC) ইঞ্জিনিয়ার। দেশব্যাপী বিস্তৃত আইএসপি (Nationwide ISP)-তে কাজের বাস্তব অভিজ্ঞতার মাধ্যমে আমি সিসকো (Cisco) ও মাইক্রোটিক (MikroTik) প্ল্যাটফর্মে কোর রাউটিং, সুইচিং এবং সিকিউরিটি ইনফ্রাস্ট্রাকচার তৈরিতে পারদর্শী। রিয়েল-টাইম মনিটরিং এবং যেকোনো জটিল নেটওয়ার্ক সমস্যা দ্রুত সমাধান করে সিস্টেমের সর্বোচ্চ আপটাইম নিশ্চিত করাই আমার প্রধান লক্ষ্য।
                     </p>
                 </div>
@@ -514,11 +513,11 @@
                     <div class="border-l-2 border-indigo-500/30 pl-4 space-y-4">
                         <div>
                             <div class="flex flex-col md:flex-row justify-between items-start md:items-center">
-                                <h4 class="font-bold text-white text-base md:text-lg">IT Support &amp; NOC Engineer</h4>
-                                <span class="text-xs font-bold text-indigo-400 bg-indigo-500/10 px-3 py-1 rounded-full border border-indigo-500/20 mt-1 md:mt-0">Nov 2024 - Present</span>
+                                <h4 data-cms="resume-job-title" class="font-bold text-white text-base md:text-lg">IT Support &amp; NOC Engineer</h4>
+                                <span data-cms="resume-job-duration" class="text-xs font-bold text-indigo-400 bg-indigo-500/10 px-3 py-1 rounded-full border border-indigo-500/20 mt-1 md:mt-0">Nov 2024 - Present</span>
                             </div>
-                            <p class="text-gray-400 text-sm font-semibold mt-1">AK Networks &amp; Bright Technologies Limited (Nationwide ISP)</p>
-                            <ul class="list-disc list-inside text-gray-300 text-sm mt-2 space-y-1">
+                            <p data-cms="resume-job-company" class="text-gray-400 text-sm font-semibold mt-1">AK Networks &amp; Bright Technologies Limited (Nationwide ISP)</p>
+                            <ul data-cms="resume-job-details" class="list-disc list-inside text-gray-300 text-sm mt-2 space-y-1">
                                 <li>সিসকো ও মাইক্রোটিক ডিভাইসের সাহায্যে আইএসপি ব্যাকবোন ও কোর নেটওয়ার্ক মনিটরিং।</li>
                                 <li>OLT (BDCOM/VSOL) কনফিগারেশন, FTTx এবং ক্লায়েন্ট ব্রডব্যান্ড ট্রাবলশুটিং।</li>
                                 <li>Zabbix এবং Cacti এর সাহায্যে সিস্টেমের পারফরমেন্স ও পিং অ্যালার্ট ট্র্যাকিং।</li>
@@ -533,18 +532,18 @@
                     <div class="border-l-2 border-indigo-500/30 pl-4 space-y-6">
                         <div>
                             <div class="flex flex-col md:flex-row justify-between items-start md:items-center">
-                                <h4 class="font-bold text-white text-base">B.Sc. in Computer Science &amp; Engineering (CSE)</h4>
-                                <span class="text-xs font-bold text-indigo-400 bg-indigo-500/10 px-3 py-1 rounded-full border border-indigo-500/20 mt-1 md:mt-0">Ongoing</span>
+                                <h4 data-cms="resume-edu1-title" class="font-bold text-white text-base">B.Sc. in Computer Science &amp; Engineering (CSE)</h4>
+                                <span data-cms="resume-edu1-duration" class="text-xs font-bold text-indigo-400 bg-indigo-500/10 px-3 py-1 rounded-full border border-indigo-500/20 mt-1 md:mt-0">Ongoing</span>
                             </div>
-                            <p class="text-gray-400 text-sm">Northern University Bangladesh</p>
+                            <p data-cms="resume-edu1-school" class="text-gray-400 text-sm">Northern University Bangladesh</p>
                         </div>
                         <div>
                             <div class="flex flex-col md:flex-row justify-between items-start md:items-center">
-                                <h4 class="font-bold text-white text-base">Diploma in Computer Technology</h4>
-                                <span class="text-xs font-bold text-indigo-400 bg-indigo-500/10 px-3 py-1 rounded-full border border-indigo-500/20 mt-1 md:mt-0">Completed 2024</span>
+                                <h4 data-cms="resume-edu2-title" class="font-bold text-white text-base">Diploma in Computer Technology</h4>
+                                <span data-cms="resume-edu2-duration" class="text-xs font-bold text-indigo-400 bg-indigo-500/10 px-3 py-1 rounded-full border border-indigo-500/20 mt-1 md:mt-0">Completed 2024</span>
                             </div>
-                            <p class="text-gray-400 text-sm mb-1">Barguna Govt Polytechnic Institute</p>
-                            <p class="text-xs text-gray-500 font-bold">GPA: 3.53 / 4.00</p>
+                            <p data-cms="resume-edu2-school" class="text-gray-400 text-sm mb-1">Barguna Govt Polytechnic Institute</p>
+                            <p data-cms="resume-edu2-details" class="text-xs text-gray-500 font-bold">GPA: 3.53 / 4.00</p>
                         </div>
                     </div>
                 </div>
