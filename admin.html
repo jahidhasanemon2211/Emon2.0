@@ -859,6 +859,8 @@
                     } else if (key === 'contact-phone') {
                         // Href has tel: but we only want raw text inside phone
                         inputEl.value = el.innerText.trim();
+                    } else if (key === 'visitor-api') {
+                        inputEl.value = el.getAttribute('content') || '';
                     } else {
                         // Regular text block or HTML titles
                         inputEl.value = el.innerHTML.trim().replace(/\s+/g, ' ');
@@ -948,6 +950,8 @@
                             if (bar) {
                                 bar.setAttribute('style', `width: ${parseInt(val) || 0}%;`);
                             }
+                        } else if (key === 'visitor-api') {
+                            el.setAttribute('content', val);
                         } else {
                             // Inject user text or HTML content
                             el.innerHTML = val;
