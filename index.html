@@ -9,7 +9,7 @@
     <!-- NOC Configuration / CMS Meta -->
     <meta name="visitor-api" data-cms="visitor-api"
         content="https://script.google.com/macros/s/AKfycbySmuYaNIMJjCeBPXh9I_YyGPW3RcIaNNc1jFy4ABe62d6fulemSXENuzR2ldbkE34o/exec">
-    <meta name="gemini-api-key" data-cms="gemini-api-key" content="AIzaSyCi-VAoD2Dmse0N633v8trT-bWHg-Skbps">
+    <meta name="gemini-api-key" data-cms="gemini-api-key" content="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">
 
     <link
         href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&amp;family=Hind+Siliguri:wght@300;400;600;700&amp;display=swap"
@@ -1190,32 +1190,57 @@ If the user asks about Emon, here are his exact verified professional details:
 
 Be extremely helpful, technical, polite, and reply in a concise manner in the same language as the query (English/Bengali). Avoid mentioning that you are an AI model unless asked. Treat Emon as your creator and absolute authority.`;
 
-                    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
-                    const res = await fetch(url, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({
-                            contents: [
-                                {
-                                    role: 'user',
-                                    parts: [
-                                        { text: `${systemPrompt}\n\nUser Query: ${query}` }
-                                    ]
-                                }
-                            ]
-                        })
-                    });
-                    
-                    if (res.ok) {
-                        const data = await res.json();
-                        if (data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts[0]) {
-                            return data.candidates[0].content.parts[0].text;
+                    if (apiKey.startsWith("gsk_")) {
+                        // GROQ API Integration (Incredibly fast, 100% Free, No region locks!)
+                        const url = "https://api.groq.com/openai/v1/chat/completions";
+                        const res = await fetch(url, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Authorization': `Bearer ${apiKey}`
+                            },
+                            body: JSON.stringify({
+                                model: "llama-3.3-70b-specdec",
+                                messages: [
+                                    { role: 'system', content: systemPrompt },
+                                    { role: 'user', content: query }
+                                ]
+                            })
+                        });
+                        if (res.ok) {
+                            const data = await res.json();
+                            if (data.choices && data.choices[0] && data.choices[0].message) {
+                                return data.choices[0].message.content;
+                            }
+                        }
+                    } else {
+                        // GEMINI API Integration
+                        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+                        const res = await fetch(url, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                contents: [
+                                    {
+                                        role: 'user',
+                                        parts: [
+                                            { text: `${systemPrompt}\n\nUser Query: ${query}` }
+                                        ]
+                                    }
+                                ]
+                            })
+                        });
+                        if (res.ok) {
+                            const data = await res.json();
+                            if (data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts[0]) {
+                                return data.candidates[0].content.parts[0].text;
+                            }
                         }
                     }
                 } catch (e) {
-                    console.error("Gemini API call failed, falling back to local database...", e);
+                    console.error("AI API call failed, falling back to local database...", e);
                 }
             }
 
