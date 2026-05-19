@@ -634,6 +634,24 @@
             // Robust multi-fallback IP geolocation lookup
             let ipInfo = null;
 
+            // Simple User-Agent Parser for Browser and OS
+            const ua = navigator.userAgent;
+            let browser = "Unknown";
+            let os = "Unknown";
+
+            if (ua.includes("Firefox")) browser = "Firefox";
+            else if (ua.includes("SamsungBrowser")) browser = "Samsung Internet";
+            else if (ua.includes("Opera") || ua.includes("OPR")) browser = "Opera";
+            else if (ua.includes("Edge") || ua.includes("Edg")) browser = "Edge";
+            else if (ua.includes("Chrome")) browser = "Chrome";
+            else if (ua.includes("Safari")) browser = "Safari";
+
+            if (ua.includes("Win")) os = "Windows";
+            else if (ua.includes("Android")) os = "Android";
+            else if (ua.includes("Mac")) os = "MacOS";
+            else if (ua.includes("iPhone") || ua.includes("iPad")) os = "iOS";
+            else if (ua.includes("Linux")) os = "Linux";
+
             // Try 1: ipwho.is
             try {
                 const res = await fetch('https://ipwho.is/').then(r => r.json());
@@ -683,8 +701,11 @@
                 }
             }
 
-            // If we successfully got IP info, send to backend
+            // If we successfully got IP info, append Device info and send to backend
             if (ipInfo && ipInfo.ip) {
+                ipInfo.browser = browser;
+                ipInfo.os = os;
+                
                 try {
                     await fetch(BACKEND_URL, {
                         method: 'POST',

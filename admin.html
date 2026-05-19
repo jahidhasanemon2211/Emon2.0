@@ -462,10 +462,11 @@
                                     <th class="px-6 py-4 font-bold">IP Address</th>
                                     <th class="px-6 py-4 font-bold">Network / ISP</th>
                                     <th class="px-6 py-4 font-bold">Location</th>
+                                    <th class="px-6 py-4 font-bold">Browser / OS</th>
                                 </tr>
                             </thead>
                             <tbody id="logTableBody" class="divide-y divide-white/5 font-medium">
-                                <tr><td colspan="4" class="px-6 py-12 text-center text-gray-500 text-sm">Please set your Google Apps Script API URL in "Contact & Socials" and deploy first.</td></tr>
+                                <tr><td colspan="5" class="px-6 py-12 text-center text-gray-500 text-sm">Please set your Google Apps Script API URL in "Contact & Socials" and deploy first.</td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -1032,24 +1033,23 @@
             }, 1000);
         }
 
-        // ==== Visitor Logs Fetcher ====
-        async function refreshLogs() {
+        // ==== Visitor Logs Fetch         async function refreshLogs() {
             const apiVal = document.getElementById('visitor-api').value.trim();
             const tbody = document.getElementById('logTableBody');
             
             if (!apiVal) {
-                tbody.innerHTML = `<tr><td colspan="4" class="px-6 py-12 text-center text-red-400 text-sm">Please set your Google Apps Script API URL in "Contact & Socials" and deploy first.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="5" class="px-6 py-12 text-center text-red-400 text-sm">Please set your Google Apps Script API URL in "Contact & Socials" and deploy first.</td></tr>`;
                 return;
             }
 
-            tbody.innerHTML = `<tr><td colspan="4" class="px-6 py-12 text-center text-indigo-300 text-sm"><i class="fas fa-spinner fa-spin mr-2"></i> Loading visitor logs...</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="5" class="px-6 py-12 text-center text-indigo-300 text-sm"><i class="fas fa-spinner fa-spin mr-2"></i> Loading visitor logs...</td></tr>`;
 
             try {
                 const response = await fetch(apiVal);
                 const logs = await response.json();
 
                 if (!Array.isArray(logs) || logs.length === 0) {
-                    tbody.innerHTML = `<tr><td colspan="4" class="px-6 py-12 text-center text-gray-400 text-sm">No visitor logs found.</td></tr>`;
+                    tbody.innerHTML = `<tr><td colspan="5" class="px-6 py-12 text-center text-gray-400 text-sm">No visitor logs found.</td></tr>`;
                     return;
                 }
 
@@ -1062,11 +1062,15 @@
                         <td class="px-6 py-4 text-emerald-400 font-mono text-xs">${log.IP || '-'}</td>
                         <td class="px-6 py-4 text-gray-300 text-xs">${log.ISP || '-'}</td>
                         <td class="px-6 py-4 text-gray-400 text-xs">${log.City ? log.City + ', ' + log.Country : '-'}</td>
+                        <td class="px-6 py-4 text-gray-400 text-xs font-semibold">
+                            <span class="text-indigo-400"><i class="fab fa-chrome mr-1"></i>${log.Browser || 'Unknown'}</span>
+                            <span class="text-gray-500 text-[10px] ml-1">on ${log.OS || 'Unknown'}</span>
+                        </td>
                     </tr>
                 `).join('');
             } catch (error) {
                 console.error('Failed to fetch logs:', error);
-                tbody.innerHTML = `<tr><td colspan="4" class="px-6 py-12 text-center text-red-400 text-sm">Failed to load logs. Ensure your API URL is correct and supports GET requests.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="5" class="px-6 py-12 text-center text-red-400 text-sm">Failed to load logs. Ensure your API URL is correct and supports GET requests.</td></tr>`;
             }
         }
     </script>
