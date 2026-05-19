@@ -631,26 +631,70 @@
             const BACKEND_URL = apiMeta ? apiMeta.content : "";
             if (!BACKEND_URL || BACKEND_URL.trim() === "") return; // Disable if URL not set
 
+            // Robust multi-fallback IP geolocation lookup
+            let ipInfo = null;
+
+            // Try 1: ipwho.is
             try {
-                // Free IP lookup (ipwho.is is extremely fast and doesn't block requests with Cloudflare)
-                const ipInfo = await fetch('https://ipwho.is/').then(r => r.json());
-                
-                if (ipInfo && ipInfo.success) {
-                    // Silent POST
+                const res = await fetch('https://ipwho.is/').then(r => r.json());
+                if (res && res.success) {
+                    ipInfo = {
+                        ip: res.ip,
+                        isp: res.connection ? res.connection.isp : "Unknown",
+                        city: res.city || "Unknown",
+                        country: res.country || "Unknown"
+                    };
+                }
+            } catch (e) {
+                console.warn('ipwho.is failed or was blocked.');
+            }
+
+            // Try 2: freeipapi.com (reliable alternative)
+            if (!ipInfo) {
+                try {
+                    const res = await fetch('https://freeipapi.com/api/json').then(r => r.json());
+                    if (res && res.ipAddress) {
+                        ipInfo = {
+                            ip: res.ipAddress,
+                            isp: res.asnOrganization || "Unknown",
+                            city: res.cityName || "Unknown",
+                            country: res.countryName || "Unknown"
+                        };
+                    }
+                } catch (e) {
+                    console.warn('freeipapi.com failed.');
+                }
+            }
+
+            // Try 3: ipify.org (raw IP fallback - rarely blocked)
+            if (!ipInfo) {
+                try {
+                    const res = await fetch('https://api.ipify.org?format=json').then(r => r.json());
+                    if (res && res.ip) {
+                        ipInfo = {
+                            ip: res.ip,
+                            isp: "Unknown",
+                            city: "Unknown",
+                            country: "Unknown"
+                        };
+                    }
+                } catch (e) {
+                    console.warn('All IP lookups failed.');
+                }
+            }
+
+            // If we successfully got IP info, send to backend
+            if (ipInfo && ipInfo.ip) {
+                try {
                     await fetch(BACKEND_URL, {
                         method: 'POST',
                         mode: 'no-cors',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            ip: ipInfo.ip,
-                            isp: ipInfo.connection ? ipInfo.connection.isp : "Unknown",
-                            city: ipInfo.city || "Unknown",
-                            country: ipInfo.country || "Unknown"
-                        })
+                        body: JSON.stringify(ipInfo)
                     });
+                } catch (e) {
+                    console.warn('Failed to send visitor log to backend.');
                 }
-            } catch (e) {
-                console.warn('Visitor tracking failed.');
             }
         })();
     </script>
