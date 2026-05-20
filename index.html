@@ -1199,7 +1199,30 @@ If the user asks about Emon, here are his exact verified professional details:
 
 Be extremely helpful, technical, polite, and reply in a concise manner in the same language as the query (English/Bengali). Avoid mentioning that you are an AI model unless asked. Treat Emon as your creator and absolute authority.`;
 
-                    if (apiKey.startsWith("gsk_")) {
+                    if (apiKey.startsWith("sk-or-v1-")) {
+                        // OpenRouter Integration (100% CORS support, Free models, Works globally!)
+                        const url = "https://openrouter.ai/api/v1/chat/completions";
+                        const res = await fetch(url, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Authorization': `Bearer ${apiKey}`
+                            },
+                            body: JSON.stringify({
+                                model: "google/gemma-2-9b-it:free",
+                                messages: [
+                                    { role: 'system', content: systemPrompt },
+                                    { role: 'user', content: query }
+                                ]
+                            })
+                        });
+                        if (res.ok) {
+                            const data = await res.json();
+                            if (data.choices && data.choices[0] && data.choices[0].message) {
+                                return data.choices[0].message.content;
+                            }
+                        }
+                    } else if (apiKey.startsWith("gsk_")) {
                         // GROQ API Integration (Incredibly fast, 100% Free, No region locks!)
                         const url = "https://api.groq.com/openai/v1/chat/completions";
                         const res = await fetch(url, {
