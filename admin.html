@@ -1206,17 +1206,28 @@
                     return;
                 }
 
-                // Sort newest first
-                logs.sort((a, b) => new Date(b.Timestamp) - new Date(a.Timestamp));
+                // Normalize keys of all logs to lowercase and trim spaces for absolute resilience
+                logs = logs.map(log => {
+                    const normalized = {};
+                    Object.keys(log).forEach(key => {
+                        if (key) {
+                            normalized[key.toLowerCase().trim()] = log[key];
+                        }
+                    });
+                    return normalized;
+                });
+
+                // Sort newest first (using lowercase key)
+                logs.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
 
                 tbody.innerHTML = logs.map(log => {
-                    let browserName = log.Browser;
-                    let osName = log.OS;
-                    let ispName = log.ISP || '-';
+                    let browserName = log.browser;
+                    let osName = log.os;
+                    let ispName = log.isp || '-';
 
                     // Dual parsing: Extract device info from ISP if dedicated Browser/OS columns are missing
                     if (!browserName || browserName === 'Unknown' || !osName || osName === 'Unknown') {
-                        const ispParts = (log.ISP || '').split(' | ');
+                        const ispParts = (log.isp || '').split(' | ');
                         if (ispParts.length > 1) {
                             ispName = ispParts[0];
                             const deviceParts = ispParts[1].split(' on ');
@@ -1225,20 +1236,28 @@
                         }
                     } else {
                         // Clean up merged data from ISP field if dedicated values are present
-                        const ispParts = (log.ISP || '').split(' | ');
+                        const ispParts = (log.isp || '').split(' | ');
                         if (ispParts.length > 1) {
                             ispName = ispParts[0];
                         }
                     }
 
+                    // Map chrome icon based on browser name
+                    let browserIcon = 'fa-chrome';
+                    const bLower = (browserName || '').toLowerCase();
+                    if (bLower.includes('firefox')) browserIcon = 'fa-firefox-browser';
+                    else if (bLower.includes('safari')) browserIcon = 'fa-safari';
+                    else if (bLower.includes('edge')) browserIcon = 'fa-edge';
+                    else if (bLower.includes('opera')) browserIcon = 'fa-opera';
+
                     return `
                     <tr class="hover:bg-white/[0.02] transition-colors">
-                        <td class="px-6 py-4 text-xs text-gray-400 whitespace-nowrap">${log.Timestamp ? new Date(log.Timestamp).toLocaleString() : '-'}</td>
-                        <td class="px-6 py-4 text-emerald-400 font-mono text-xs">${log.IP || '-'}</td>
+                        <td class="px-6 py-4 text-xs text-gray-400 whitespace-nowrap">${log.timestamp ? new Date(log.timestamp).toLocaleString() : '-'}</td>
+                        <td class="px-6 py-4 text-emerald-400 font-mono text-xs">${log.ip || '-'}</td>
                         <td class="px-6 py-4 text-gray-300 text-xs">${ispName || '-'}</td>
-                        <td class="px-6 py-4 text-gray-400 text-xs">${log.City ? log.City + ', ' + log.Country : '-'}</td>
+                        <td class="px-6 py-4 text-gray-400 text-xs">${log.city ? log.city + ', ' + log.country : '-'}</td>
                         <td class="px-6 py-4 text-gray-400 text-xs font-semibold">
-                            <span class="text-indigo-400"><i class="fab fa-chrome mr-1"></i>${browserName || 'Unknown'}</span>
+                            <span class="text-indigo-400"><i class="fab ${browserIcon} mr-1"></i>${browserName || 'Unknown'}</span>
                             <span class="text-gray-500 text-[10px] ml-1">on ${osName || 'Unknown'}</span>
                         </td>
                     </tr>
