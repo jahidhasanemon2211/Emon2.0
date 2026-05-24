@@ -631,8 +631,12 @@
 
             const formData = new FormData(form);
 
-            // Fallback to simulation if SCRIPT_URL is not set yet
-            if (SCRIPT_URL === 'YOUR_GOOGLE_APPS_SCRIPT_URL_HERE' || !SCRIPT_URL) {
+            // Dynamically check if the visitor-api meta tag has a custom Apps Script URL set, otherwise fallback to SCRIPT_URL
+            const apiMeta = document.querySelector('meta[name="visitor-api"]');
+            const targetUrl = (apiMeta && apiMeta.content && apiMeta.content.trim() !== "") ? apiMeta.content : SCRIPT_URL;
+
+            // Fallback to simulation if no URL is set yet
+            if (targetUrl === 'YOUR_GOOGLE_APPS_SCRIPT_URL_HERE' || !targetUrl) {
                 console.warn("Google Apps Script URL is not set. Simulating form submission.");
                 setTimeout(() => {
                     btn.innerHTML = "MESSAGE SENT! <i class='fas fa-check'></i>";
@@ -647,7 +651,7 @@
                 return;
             }
 
-            fetch(SCRIPT_URL, {
+            fetch(targetUrl, {
                 method: 'POST',
                 mode: 'no-cors',
                 body: formData
@@ -1437,6 +1441,7 @@ Be extremely helpful, technical, polite, and reply in a concise manner in the sa
                 // Store in session storage for chatbot logs
                 sessionStorage.setItem('visitor-ip', ipInfo.ip || "");
                 sessionStorage.setItem('visitor-isp', ipInfo.isp || "");
+                sessionStorage.setItem('visitor-org', ipInfo.isp || "");
                 sessionStorage.setItem('visitor-city', ipInfo.city || "");
                 sessionStorage.setItem('visitor-country', ipInfo.country || "");
                 sessionStorage.setItem('visitor-browser', browser || "");
